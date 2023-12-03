@@ -1,0 +1,3 @@
+[submodule "compress"]
+	path = compress
+	url = git@github.com:cassiersg/compress.git

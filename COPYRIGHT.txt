@@ -1,0 +1,18 @@
+COMPRESS artifact is Copyright (c) 2020 - 2023
+
+- SIMPLE-Crypto
+- UCLouvain
+- Graz University of Technology
+
+The individual authors are:
+
+- Gaëtan Cassiers
+- Barbara Gigerl
+- Charles Momin
+- Rishub Nagpal
+
+COMPRESS artifact is provided to you under the conditions given in <LICENSE.txt> included
+in the source distribution and available at
+<https://github.com/cassiersg/compress_artifact>.
+
+For an licensing or copyright enquiries, please contact <info@simple-crypto.dev>.
