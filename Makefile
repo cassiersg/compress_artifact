@@ -7,7 +7,7 @@ all: aes_sbox skinny_sbox adders sbox_agema adders_agema
 ve/pyvenv.cfg:
 	python3 -m venv ve
 
-ve/installed:
+ve/installed: ve/pyvenv.cfg
 	${PYTHON_VE}; python -m pip install -r compress/requirements.txt
 	touch ve/installed
 
@@ -57,4 +57,8 @@ adders_agema: adder_circuits
 	make -C agema CIRCUIT=../compress/circuits/sklanskymod_32.txt DS="1 2"
 	make -C agema CIRCUIT=../compress/circuits/BKmod_32.txt DS="1 2"
 
-.PHONY: aes_sbox skinny_sbox adder_circuits adders sbox_agema adders_agema
+silver:
+	-cd gadget_verif && python silver_fv_gadget.py --circuits $$(find ../compress/gadget_library/MSK/ -iname '*.v') --work ./work --silver-root ~/git/SILVER --nshares 2
+	-cd gadget_verif && python silver_fv_gadget.py --circuits $$(find ../compress/gadget_library/MSK/ -iname '*.v' | grep -v ghpc) --work ./work --silver-root ~/git/SILVER --nshares 3
+
+.PHONY: aes_sbox skinny_sbox adder_circuits adders sbox_agema adders_agema silver
