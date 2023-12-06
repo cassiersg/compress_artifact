@@ -202,7 +202,7 @@ def cli():
 
 def main():
     args = cli().parse_args()
-    fail = False
+    fail = 0
     for circuit in args.circuits:
         params = Settings(
                 circuit=circuit,
@@ -220,9 +220,11 @@ def main():
             p = 'PASS' if c else 'FAIL'
             print(f'{p} verification of {params.circuit} with {params.nshares} shares.')
             if not c:
-                fail = True
+                fail += 1
     if fail:
+        print(f'=== {fail} gadgets FAILED. ===')
         exit(1)
+    print(f'=== All gadgets PASSED. ===')
 
 
 if __name__ == '__main__':

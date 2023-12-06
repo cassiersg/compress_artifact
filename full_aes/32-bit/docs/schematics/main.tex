@@ -1,0 +1,229 @@
+\documentclass{scrartcl}
+
+\usepackage{tikz-timing}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\usepackage{xcolor}
+\usetikzlibrary{shapes.symbols}
+
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  mathescape
+}
+
+\input{macros}
+\input{tikzset_cfg.tex}
+\input{tikz_color}
+
+\begin{document}
+
+
+\subsection{Architecture of the $\modAESdpKey$ module}
+
+\begin{figure}
+    \centering
+    \resizebox{\textwidth}{!}{
+        \begin{tikzpicture}
+            \input{tikz_dpKey}
+        \end{tikzpicture}
+    }
+    \caption{Global architecture of the module $\modAESdpKey$. The value held by the DFF at index $i$ is depicted by the signal $\dpKeyDFF{i}$ in the HDL.}
+    \label{fig:aes_dpKey}
+\end{figure}
+
+The module $\modAESdpKey$ is shown in Figure~\ref{fig:aes_dpKey}. It is
+organized as a shift register where each register unit holds a masked byte of
+the key. The module is split in 4~independent parts, each taking care of the
+key scheduling operation on a single row. The sharing of the 128-bit key is
+routed from the input with the control signal $\dpKeyCtrlInit$. Two relevant
+bytes ordering are depicted on the Figure and both refers to the byte index in
+the unmasked key. First, the number on the top depict the byte ordering at the
+beginning of a round when the key addition occurs. Second, the bottom number
+(between parentheses) depict the byte ordering when a fresh execution starts,
+at the last cycle of a round or when the $\SB$ layer results of the key
+scheduling are fetch back from the S-boxes, as detailed next. In practice, the
+second ordering corresponds to the first one with a rotation of 1 column to the
+left.
+
+Concretely, the key scheduling starts by sending the rightmost column of the key
+(i.e., then byte indexes 12, 13, 14 and 15) to the S-boxes. The $\texttt{RotWord}$
+operation is performed by the routing that sends the key bytes to the S-boxes.
+Once computed, the result of the $\SB$ layer is routed back to the core through
+the MUX controlled by the signal $\dpKeyCtrlRouteFromSB$. At the same time,
+the round constant is applied and the first column (i.e., byte indexes 0,1,2
+and 3) of the new key is computed by adding its value to the column coming back
+from the S-boxes.  The remaining three columns (i.e., byte indexes [4,5,6,7],
+[8,9,10,11] and [12,13,14,15] are then updated sequentially by XORing each
+bytes with the value of the last byte updated in the same row. The signal
+$\dpKeyCtrlLoop$ is used to make the key shares loop across the key pipeline.
+This is required to keep the key material after the $\AK$ operations while the
+$\SB$ results of the key scheduling is still under computation. 
+
+\subsection{Internal operation}
+
+Let us first introduce notations for the intermediate states in the AES algorithm with
+pseudo-code in Figure~\ref{fig:code_round} and Figure~\ref{fig:code_key}.
+Each variable denotes a state or subkey byte at a given step of the algorithm.
+In particular, the plaintext (resp. key, ciphertext) byte at index $0\leq i<16$
+is denoted \pP{i} (resp. $\pK{i}$, $\pCt{i}$), and the value $\pS{i}{r}$ (resp.
+$\pRK{i}{r}$) denotes the byte at index $i$ of the state (resp. round key)
+starting the $r$-th round.
+When no index is given, the full 128-bit state is considered instead.
+
+\begin{figure}
+    \begin{lstlisting}[frame=single]
+    %%% First key addition
+    for $0\leq i <16$ do
+        $\pS{i}{0} = \pP{i} \oplus \pK{i}$;
+    done
+    
+    %%% Perform the rounds
+    for $0\leq r < 9$ do 
+        % Operation for a single round
+        $\pSR{}{r} = \SR(\pS{}{r})$;
+        $\pSB{}{r} = \SB(\pSR{}{r})$;
+        $\pMC{}{r} = \MC(\pSB{}{r})$;
+        $\pAK{}{r} = \AK(\pMC{}{r},\pRK{}{r})$;
+        $\pS{}{r+1} = \pAK{}{r}$;
+    done
+    
+    %%% Last round
+    $\pSR{}{9}=\SR(\pS{}{9})$;
+    $\pSB{}{9}=\SB(\pSR{}{9})$;
+    $\pAK{}{9}=\AK(\pSB{}{9})$;
+    $\pCt{} = \pAK{}{9}$;
+    \end{lstlisting}
+    \caption{Pseudo-code of the AES encryption.}
+    \label{fig:code_round}
+\end{figure}
+
+
+\begin{figure}
+    \begin{lstlisting}[frame=single]
+    %%% Key evolution for each round key 
+    for $0\leq r < 10$ do
+        % Fetch value on which operate
+        if $r==0$ then
+            $t^r = \pK{}$; 
+        else 
+            $t^r = \pRK{}{r-1}$;
+        end
+
+        % Perform the last column rotation
+        $[\pR{0}{r},\pR{1}{r},\pR{2}{r},\pR{3}{r}] = [t_{13}^{r},t_{14}^{r},t_{15}^{r},t_{12}^{r}]$; 
+
+        % Perform SubWord on the rotated column
+        $[\pRSB{0}{r},\pRSB{1}{r},\pRSB{2}{r},\pRSB{3}{r}] = [\SW{\pR{0}{r}},\SW{\pR{1}{r}},\SW{\pR{2}{r}},\SW{\pR{3}{r}}]$
+
+        % Compute the first column of the next round key
+        $\pRK{0}{r} = \pRSB{0}{r} \oplus t_{0}^{r} \oplus \RCON{r}$;
+        $\pRK{1}{r} = \pRSB{1}{r} \oplus t_{1}^{r}$;
+        $\pRK{2}{r} = \pRSB{2}{r} \oplus t_{2}^{r}$;
+        $\pRK{3}{r} = \pRSB{3}{r} \oplus t_{3}^{r}$;
+
+        % Generate the three remaining columns
+        for $1\leq i <4$ do
+            for $0\leq j <4$ do
+                $\pRK{4i+j}{r} = \pRK{4(i-1)+j}{r} \oplus t_{4i+j}^{r}$;
+            done
+        done
+    done
+    \end{lstlisting}
+    \caption{Pseudo-code for the AES key evolution.}
+    \label{fig:code_key}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \input{figures/tikz_time_pipe_sbox}
+    \caption{Data going into / coming from the S-boxes during a round.}
+    \label{fig:pipe_sbox}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \input{figures/tikz_time_pipe_dpkey}
+    \caption{Data going into / coming from the key scheduling datapath during a round.}
+    \label{fig:pipe_dpkey}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \input{figures/tikz_time_pipe_dpstate}
+    \caption{Data going into / coming from the round function datapath during a round.}
+    \label{fig:pipe_dpstate}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \input{figures/tikz_time_first_round} 
+    \caption{Data routing when a new execution starts.}
+    \label{fig:time_first_round}
+\end{figure}
+
+Using these notations, Figures~\ref{fig:pipe_sbox}, \ref{fig:pipe_dpkey}
+and~\ref{fig:pipe_dpstate} describe the evolution of the AES states stored in
+the architecture over the computation of one round.
+Next, Figures~\ref{fig:time_first_round}, \ref{fig:time_regime}
+and~\ref{fig:time_last_round} depict the control signals that drive the
+datapath for the first round, middle rounds, and last round.
+In particular, for the first round (Figure~\ref{fig:time_first_round}), the
+data is fetched by the module when the signal $\portAESInValid$ is asserted if
+the core is not busy, there is no ciphertext stored in the core and randomness
+is available.
+At the next clock cycle, the
+internal FSM counters $\timeCnrRound$ and $\timeCnrCycle$ are reset and the
+execution begins. The round function and the key scheduling algorithm are
+executed in parallel by interleaving the S-boxes usage appropriately. In
+particular, the first cycle of the execution is used to start the key
+scheduling algorithm by asserting $\AESsboxFeedKey$ and $\AESsboxValidIn$.
+During this cycle, the module $\modAESdpKey$ is enabled and the
+$\dpKeyCtrlLoop$ (rotating then the columns), while the module $\modAESdpState$
+is disabled.
+
+\begin{figure}
+    \centering
+    \input{figures/tikz_time_regime} 
+    \caption{In regime data routing.}
+    \label{fig:time_regime}
+\end{figure}
+
+Then, the core enters into a nominal regime that computes a round in 8~cycles,
+as depicted in Figure~\ref{fig:time_regime}.
+A typical round starts with 4~clock cycles during which data is read from the
+state registers, XORed with the subkey and fed to the S-boxes, which performs
+the $\AK$, $\SR$ and $\SB$ layers for the full state (one column per cycle).
+During these cycles, $\AESsboxValidIn$ is asserted and data (state and subkey)
+loops over the shift registers. An exception occurs at the fourth cycle (i.e., when $\timeCnrCycle=3$): at this cycle, the S-boxes
+output the column of the new subkey value, which is processed by deasserting $\dpKeyCtrlLoop$.  
+Next, during the last 4~cycles of a round, the S-boxes output the 4~columns of
+the state, on which the $\MC$ layer is directly applied, and the result is
+stored in the state registers. At the same time, the subkey update is
+finalized, such that a new subkey is ready at the last cycle of a round (i.e.,
+$\timeCnrCycle=7$). During this last cycle, the next key schedule round is
+started, and a new state round starts at the following cycle. 
+
+\begin{figure}
+    \centering
+    \input{figures/tikz_time_last_round} 
+    \caption{Data routing during last rounds.}
+    \label{fig:time_last_round}
+\end{figure}
+
+%\todo{validate routeMC and loop last cycle}
+%\todo{validate feedsbkey last cycle}
+
+Finally, the last round is very similar to the regime mode except that the
+module $\dpStateModMC$is bypassed. In particular, the signal
+$\dpStateCtrlRouteMC$ is de-asserted and the shift registers are configured to
+make the data loop. No new key scheduling round is started during this last
+cycle.
+At the end of the last round, once the ciphertext has been fetched from the
+output, a new encryption starts immediately (if $\portAESInValid$ is asserted),
+or the state register is cleared by asserting the control signal
+$\dpStateCtrlRouteIn$. This ensures that the core is completely clear of any
+key- or plaintext-dependent data.
+
+\end{document}
