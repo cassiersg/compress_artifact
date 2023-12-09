@@ -10,12 +10,12 @@ def parse_reports(reports, module):
     for report in reports:
         with open(report) as f:
             l = json.load(f)
-        _, order = str(report.parent.name).rsplit('_', 1)
-        order = int(order[1:])
+        _, nshares = str(report.parent.name).rsplit('_', 1)
+        nshares = int(nshares)
         areaum2 = float(l['design']['area'])
         area_ge = areaum2/GE
-        area_rnd_ge = 33.1708333 * 34 * order * (order+1)
-        yield {'design': module, 'nshares': order+1, 'area_ge': area_ge, 'area_ge_wrnd': area_ge + area_rnd_ge}
+        area_rnd_ge = 33.1708333 * 2 * nshares * (nshares-1)/2
+        yield {'design': module, 'nshares': nshares, 'area_ge': area_ge, 'area_ge_wrnd': area_ge + area_rnd_ge}
 
 
 def cli():

@@ -1,7 +1,7 @@
 
 SHELL=/bin/bash
 VE=$(abspath ./work/ve)
-VE_INsTALLED=$(VE)/installed
+VE_INSTALLED=$(VE)/installed
 PYTHON_VE=source $(VE)/bin/activate
 
 all: help
@@ -13,21 +13,21 @@ $(VE)/pyvenv.cfg:
 	mkdir -p work
 	python3 -m venv $(VE)
 
-$(VE)/installed: $(VE)/pyvenv.cfg
+$(VE_INSTALLED): $(VE)/pyvenv.cfg
 	${PYTHON_VE}; python -m pip install -r compress/requirements.txt
-	touch $(VE_INsTALLED)
+	touch $(VE_INSTALLED)
 
 ### Sboxes ###
 
-aes_sbox_%: $(VE_INSTALLED)
+aes_sbox_compress: aes_sbox_opt aes_sbox_sep aes_sbox_base
+aes_sbox_opt aes_sbox_sep aes_sbox_base: aes_sbox_%: $(VE_INSTALLED)
 	# Generate AES S-box designs reported in the paper.
 	${PYTHON_VE}; make -C compress CIRCUIT=circuits/aes_bp.txt LATS="4 5 6" DS="2 3 4 5" GADGETS_CONFIG=gadget_library/gadgets_$*.toml WORK=../work/aes_$* area
-aes_sbox_compress: aes_sbox_opt aes_sbox_sep aes_sbox_base
 
-skinny_sbox_%: $(VE_INSTALLED)
+skinny_sbox_compress: skinny_sbox_opt skinny_sbox_sep skinny_sbox_base
+skinny_sbox_opt skinny_sbox_sep skinny_sbox_base: skinny_sbox_%: $(VE_INSTALLED)
 	# Generate Skinny (8-bit S-box) designs reported in the paper.
 	${PYTHON_VE}; make -C compress CIRCUIT=circuits/skinny8.txt LATS="4 5 6" DS="2 3 4 5" GADGETS_CONFIG=gadget_library/gadgets_$*.toml WORK=../work/skinny_$* area
-skinny_sbox_compress: skinny_sbox_opt skinny_sbox_sep skinny_sbox_base
 
 sbox_compress: aes_sbox_compress skinny_sbox_compress
 
@@ -38,36 +38,38 @@ sbox_handcrafting: $(VE_INSTALLED)
 
 # AGEMA (HPC3 pipeline only, since handcrafting does HPC2 better).
 sbox_agema:
-	make -C agema CIRCUIT=../compress/circuits/aes_bp.txt WORK=../work/agema_aes
-	make -C agema CIRCUIT=../compress/circuits/skinny8.txt WORK=../work/agema_skinny
+	make -C agema CIRCUIT=../compress/circuits/aes_bp.txt WORK=$(abspath work/aes_agema)
+	make -C agema CIRCUIT=../compress/circuits/skinny8.txt WORK=$(abspath work/skinny_agema)
 
-# TODO: serialized skinny s-box
+skinny_sbox_serialized:
+	make -C skinny_serialized_sbox WORK=$(abspath work/skinny_serialized)
+
 
 ### Adders ###
 
 ADDERS= RC3mod KSmod sklanskymod BKmod
 ADDER_DIR=$(abspath ./work/adder_circuits)
 adder_circuits:
+	mkdir -p $(ADDER_DIR)
 	${PYTHON_VE}; set -e; $(foreach ADDER,$(ADDERS), \
 		python compress/scripts/generate_adder_circuit.py -n 32 --type $(ADDER) --out $(ADDER_DIR)/$(ADDER)_32.txt; \
 	)
 
 adders_compress: $(VE_INSTALLED) adder_circuits
 	# Generate adder designs reported in the paper.
-	${PYTHON_VE}; make -C compress CIRCUIT=$(ADDER_DIR)/RC3mod_32.txt LATS="31 32" DS="2 3" WORK=../work/adders area
-	${PYTHON_VE}; make -C compress CIRCUIT=$(ADDER_DIR)/KSmod_32.txt LATS="5 12" DS="2 3" WORK=../work/adders area
-	${PYTHON_VE}; make -C compress CIRCUIT=$(ADDER_DIR)/sklanskymod_32.txt LATS="6 12" DS="2 3" WORK=../work/adders area
-	${PYTHON_VE}; make -C compress CIRCUIT=$(ADDER_DIR)/BKmod_32.txt LATS="9 18" DS="2 3" WORK=../work/adders area
+	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/RC3mod_32.txt LATS="31 32" DS="2 3" area
+	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/KSmod_32.txt LATS="5 12" DS="2 3" area
+	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/sklanskymod_32.txt LATS="6 12" DS="2 3" area
+	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/BKmod_32.txt LATS="9 18" DS="2 3" area
 
 adders_handcrafting: $(VE_INSTALLED) adder_circuits
-	${PYTHON_VE}; set -e; $(foeach ADDER,$(ADDERS), \
-		make -C compress CIRCUIT=$(ADDER_DIR)/$(ADDER).txt LATS="32" DS="2 3" WORK=../work/adders_handcrafting COMPRESS_SCRIPT=scripts/handcrafting.py area; \
+	${PYTHON_VE}; set -e; $(foreach ADDER,$(ADDERS), \
+		make -C compress CIRCUIT=$(ADDER_DIR)/$(ADDER)_32.txt LATS="32" DS="2 3" WORK=$(abspath ./work/adders_handcrafting) COMPRESS_SCRIPT=scripts/handcrafting.py area; \
 	)
 
 adders_agema: adder_circuits
-	$(foeach ADDER,$(ADDERS), \
-		make -C agema CIRCUIT=$(ADDER_DIR)/$(ADDER).txt DS="1 2"; \
-		make -C compress CIRCUIT=$(ADDER_DIR)/$(ADDER).txt LATS="32" DS="2 3" WORK=../work/adders_handcrafting COMPRESS_SCRIPT=scripts/handcrafting.py area; \
+	$(foreach ADDER,$(ADDERS), \
+		make -C agema CIRCUIT=$(ADDER_DIR)/$(ADDER)_32.txt DS="1 2" WORK=$(abspath ./work/adders_agema/$(ADDER)) ; \
 	)
 
 ### Gadget verfication with silver ###
@@ -88,17 +90,24 @@ aes32beh: aes_sbox_opt
 aes32synth: aes_sbox_opt
 	make -C full_aes/32-bit/synth WORK=$(abspath ./work/aes32synth) report
 
-aes32postsynth: aes32synth
+aes32postsynth:
 	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/post_synth_simu SYNTH_WORK=$(abspath ./work/aes32synth) NUM_SHARES=$D WORK=$(abspath ./work/aes32postsynth_d$D) simu; )
 
-fullverif: aes_sbox_opt
-	WORK=$(abspath ./work/fullverif) bash -c "cd full_aes/32-bit/fullverif && ./run_fullverif.sh"
+aes32fullverif: aes_sbox_opt
+	set -e; $(foreach D,$(DS), NUM_SHARES=$D WORK=$(abspath ./work/aes32fullverif_d$D) bash -c "cd full_aes/32-bit/fullverif && ./run_fullverif.sh" ; )
 
 aes128beh: aes_sbox_opt
 	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/beh_simu WORK=$(abspath ./work/aes128beh_d$D) NUM_SHARES=$D simu; )
 
 aes128synth: aes_sbox_opt
 	make -C full_aes/128-bit/synth WORK=$(abspath ./work/aes128synth) report
+
+aes128postsynth:
+	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/post_synth_simu SYNTH_WORK=$(abspath ./work/aes128synth) NUM_SHARES=$D WORK=$(abspath ./work/aes128postsynth_d$D) simu; )
+
+aes128fullverif: aes_sbox_opt
+	WORK=$(abspath ./work/aes128fullverif) bash -c "cd full_aes/128-bit/fullverif && ./run_fullverif.sh"
+
 
 help:
 	@echo "See REDAME.md."

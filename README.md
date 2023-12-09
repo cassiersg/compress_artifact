@@ -47,17 +47,23 @@ Some part of the artifact additionally require:
 
 ## Usage
 
-### S-boxes
-
 All components of the artifact can be run through the top-level `Makefile`.
 
+### Required environment variables
+
+- `yosys` and `iverilog` must be in `PATH`.
+- `AGEMA_ROOT` must point to the root AGEMA directory (the one that contains `bin/` and `cell/`).
+- `FULLVERIF` must point to the `fullverif` binary (typically ending in `fullverif-check/target/release/fullverif`), or `fullverif` must be in `PATH`.
+- `SILVER_ROOT` must point to the root SILVER directory (the one that contains `bin/` and `cell/`).
+
+### S-boxes
 
 Design of S-box (AES and Skinny 8-bit) implementation using the new COMPRESS
 tool, optimized HPC2 implementations with the tool of the
 [''handcrafting''](https://eprint.iacr.org/2022/252) paper, or pipeline HPC3
 implementation using
 [AGEMA](https://github.com/Chair-for-Security-Engineering/AGEMA).
-These also synthesize the designs and report area (TODO where), using yosys and
+These also synthesize the designs and report area, using yosys and
 the NanGate45 library.
 ```
 make aes_sbox_compress
@@ -65,18 +71,27 @@ make skinny_sbox_compress
 make sbox_handcrafting
 make sbox_agema
 ```
+The reports for area usage and design generation execution time are in 
+`work/{aes,skinny}_{opt,sep,base}/{aes_bp,skinny8}_area.csv` for COMPRESS,
+`work/handcrafting/{aes_bp,skinny8}_area.csv` for handcrafting, and
+`work/agema_{skinny,aes}/{aes_bp,skinny8}_areas.csv` for AGEMA.
 
-TODO skinny VCS22
+Finally, we synthesize the serialized Skinny8 S-box of [VCS22] with
+```
+make skinny_sbox_serialized
+```
+Area report is generated in `work/skinny_serialized/areas.csv`.
 
 ### Adders
 
 Generation of masked adder circuits and their synthesis is very similar to the
-S-boxes, with the following commands. TODO area results.
+S-boxes, with the following commands.
 ```
 make adders_compress
 make adders_handcrafting
 make adders_agema
 ```
+TODO area results.
 
 ### COMPRESS gadget verification
 
@@ -93,10 +108,12 @@ For the 32-bit AES:
 
 - `make aes32beh` performs a behavioral simulation
 - `make aes32synth` runs a synthesis (yosys+NanGate45), and compares with [SMAesH](https://github.com/SIMPLE-Crypto/SMAesH).
-- `make fullverif` runs [fullverif](https://github.com/cassiersg/fullverif) to verify the security of the implementation
+- `make aes32postsynth` verifies the synthesized circuit with a simulation
+- `make aes32fullverif` runs [fullverif](https://github.com/cassiersg/fullverif) to verify the security of the implementation
 
 For the 128-bit AES:
 - `make aes128beh` performs a behavioral simulation
-- `make aes128synth` runs a synthesis (yosys+NanGate45), and compares with the
-  [related work](https://eprint.iacr.org/2022/252).
+- `make aes128synth` runs a synthesis (yosys+NanGate45), and compares with the [related work](https://eprint.iacr.org/2022/252).
+- `make aes128postsynth` verifies the synthesized circuit with a simulation
+- `make aes128fullverif` runs [fullverif](https://github.com/cassiersg/fullverif) to verify the security of the implementation
 

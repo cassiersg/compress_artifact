@@ -5,7 +5,7 @@ NUM_SHARES ?= 2
 LATENCY ?= 4
 
 HDL_ROOT_DIR=../hdl/
-TB_TARGET?=tb_aes_enc128_32bits_hpc2
+TB_TARGET?=tb_aes_enc128_32bits_hpc
 TB_DIR=$(HDL_ROOT_DIR)/tb
 TB_FILE=$(TB_DIR)/$(TB_TARGET).v
 
@@ -45,7 +45,7 @@ simu-build:
 	    -I $(TB_DIR) \
 	    -D TV_IN=\"${TVIN}\" \
 	    -D TV_OUT=\"${TVOUT}\" \
-	    $(TB_FILE) $(DESIGN_FILE) $(LIBRARY_VERILOG) ../hdl/aes_enc128_32bits_hpc2/masked_gadgets/shares2shbus.v \
+	    $(TB_FILE) $(DESIGN_FILE) $(LIBRARY_VERILOG) ../hdl/aes_enc128_32bits_hpc/masked_gadgets/shares2shbus.v \
 	    -o $(WORK)/simu-exec-$(TB_TARGET) \
 		-Pd=$(NUM_SHARES) \
 	    -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\" \

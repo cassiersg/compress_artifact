@@ -41,15 +41,16 @@ pshare(
 reg [20*rnd_bus0-1:0] rnd_bus0w;
 reg [20*rnd_bus1-1:0] rnd_bus1w;
 reg [20*rnd_bus2-1:0] rnd_bus2w;
+reg prng_start_reseed;
+wire prng_out_valid;
 
 // Clock
 always@(*) #Td clk<=~clk;
 
 // Dut
-MSKaes_128bits 
 `ifdef behavioral
+MSKaes_128bits 
 #(.d(d))
-`endif
 dut(
     .nrst(nrst),
     .clk(clk),
@@ -63,6 +64,24 @@ dut(
     .rnd_bus1w(rnd_bus1w),
     .rnd_bus2w(rnd_bus2w)
 );
+assign prng_out_valid = 1'b1;
+`else
+wrapper_aes128
+dut(
+    .nrst(nrst),
+    .clk(clk),
+    .valid_in(valid_in),
+    .ready(ready),
+    .cipher_valid(cipher_valid),
+    .sh_plaintext(sh_plaintext),
+    .sh_key(sh_key),
+    .sh_ciphertext(sh_ciphertext),
+    .prng_seed(80'b0),
+    .prng_start_reseed(prng_start_reseed),
+    .prng_out_ready(1'b1),
+    .prng_out_valid(prng_out_valid)
+);
+`endif
 
 genvar i;
 wire [127:0] rec_ciphertext;
@@ -118,6 +137,7 @@ initial begin
     rnd_bus0w = 0;
     rnd_bus1w = 0;
     rnd_bus2w = 0;
+    prng_start_reseed = 0;
     $display("Ciruit initialized (%d shares).",d);
 
     #0.1;
@@ -128,10 +148,18 @@ initial begin
     #T;
     $display("Circuit reset.");
 
+    prng_start_reseed = 1;
+    #T;
+    prng_start_reseed = 0;
+    while (!prng_out_valid) begin
+        #T;
+    end
+
     // Start a run
     valid_in = 1;
     #T;
     valid_in = 0;
+    #T;
     while(!cipher_valid) begin
         #T;
     end

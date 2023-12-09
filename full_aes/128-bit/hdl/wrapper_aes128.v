@@ -5,7 +5,7 @@
 
 */ 
 
-// Masked AES implementation using HPC2 masking scheme and 32-bit
+// Masked AES implementation using HPC masking scheme and 128-bit
 // architecture.
 `ifndef DEFAULTSHARES
 `define DEFAULTSHARES 2
@@ -71,7 +71,7 @@ aes_core(
     .clk(clk),
     .valid_in(valid_in),
     .ready(ready),
-    .cipher_valid(aes_cipher_valid),
+    .cipher_valid(cipher_valid),
     .sh_plaintext(sh_plaintext),
     .sh_key(sh_key),
     .sh_ciphertext(sh_ciphertext),
@@ -93,7 +93,7 @@ prng_unit(
     .start_reseed(prng_start_reseed),
     .out_ready(prng_out_ready),
     .out_valid(prng_out_valid),
-    .out_rnd(prng_out_rnd),
+    .out_rnd(rnd),
     .busy(prng_busy)
 );
 

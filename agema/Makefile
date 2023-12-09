@@ -52,7 +52,7 @@ $(SRC_VERILOG): $(CIRCUIT)
 	python3 circ2v.py --circuit $< --out $@
 
 $(AREA_REPORT): $(ALL_AREAS) | summarize_areas.py
-	python3 summarize_areas.py --outcsv=$@ $^
+	python3 summarize_areas.py --module $(MODULE_NAME) --outcsv=$@ $^
 
 clean:
 	-rm -r $(WORK) / 2> /dev/null

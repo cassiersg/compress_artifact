@@ -1,6 +1,6 @@
 yosys -import
 
-set top aes_enc128_32bits_hpc2
+set top $::env(TOP)
 set synth_lib ../../../compress/synthesis/stdcells.lib
 set num_shares $::env(NUM_SHARES)
 set src_dir $::env(SRC_DIR)

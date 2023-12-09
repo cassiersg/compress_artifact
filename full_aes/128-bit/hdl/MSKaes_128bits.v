@@ -40,7 +40,7 @@ output cipher_valid;
 input [128*d-1:0] sh_plaintext;
 (* fv_type="sharing", fv_latency=0, fv_count=128 *)
 input [128*d-1:0] sh_key;
-(* fv_type="sharing", fv_latency=71, fv_count=128 *)
+(* fv_type="sharing", fv_latency=51, fv_count=128 *)
 output [128*d-1:0] sh_ciphertext;
 
 (* fv_type="random", fv_count=0, fv_rnd_count_0=20*rnd_bus0 *)

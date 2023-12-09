@@ -8,7 +8,7 @@
 // OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE.
 // Please see the CERN-OHL-P v2 for applicable conditions.
 `timescale 1ns/1ps
-module tb_aes_enc128_32bits_hpc2
+module tb_aes_enc128_32bits_hpc
 #
 (
     parameter T = 2,
@@ -22,7 +22,6 @@ module tb_aes_enc128_32bits_hpc2
 localparam wait_delay = 100*T;
 localparam init_delay=Td/2.0;
 
-//`include "MSKand_HPC2.vh"
 `include "utils.vh"
 
 localparam Td = T/2.0;
@@ -49,9 +48,12 @@ always #Td clk=~clk;
 
 
 // Dut
-aes_enc128_32bits_hpc2 #(
+aes_enc128_32bits_hpc
+`ifdef behavioral
+#(
     .d(d)
 )
+`endif
 dut(
     .clk(clk),
     .rst(syn_rst),
@@ -192,7 +194,7 @@ initial begin
     `ifdef DUMPFILE
         // Open dumping file
         $dumpfile(`DUMPFILE);
-        $dumpvars(0,tb_aes_enc128_32bits_hpc2);
+        $dumpvars(0,tb_aes_enc128_32bits_hpc);
     `endif
     
     $display("Files configuration used:");

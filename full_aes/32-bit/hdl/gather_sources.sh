@@ -13,7 +13,7 @@ fi
 
 mkdir -p $OUT_DIR
 
-SRC_DIRS="aes_enc128_32bits_hpc2 ../../../compress/gadget_library/BIN ../../../compress/gadget_library/MSK ../../../compress/gadget_library/RNG ../../../work/aes_opt/circuits/aes_bp_d${NUM_SHARES}_l${LATENCY}"
+SRC_DIRS="aes_enc128_32bits_hpc ../../../compress/gadget_library/BIN ../../../compress/gadget_library/MSK ../../../compress/gadget_library/RNG ../../../work/aes_opt/circuits/aes_bp_d${NUM_SHARES}_l${LATENCY}"
 
 # Iterate over each directory
 for var in $SRC_DIRS

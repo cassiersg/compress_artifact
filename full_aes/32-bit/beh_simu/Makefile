@@ -4,7 +4,7 @@ NUM_SHARES ?= 2
 LATENCY ?= 4
 
 HDL_ROOT_DIR=../hdl/
-TB_TARGET?=tb_aes_enc128_32bits_hpc2
+TB_TARGET?=tb_aes_enc128_32bits_hpc
 TB_DIR=$(HDL_ROOT_DIR)/tb
 TB_FILE=$(TB_DIR)/$(TB_TARGET).v
 
@@ -47,7 +47,8 @@ simu-build:
 	    -o $(WORK)/simu-exec-$(TB_TARGET) \
 		-Pd=$(NUM_SHARES) \
 	    -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\" \
-		-D DEFAULTRND=1
+		-D DEFAULTRND=1 \
+		-D behavioral
 
 clean:
 	-rm -r $(WORK)

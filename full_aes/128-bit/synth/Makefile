@@ -6,7 +6,7 @@ LATENCY = 4
 WORK_DIR=$(WORK)/hdl_d$(NUM_SHARES)_L$(LATENCY)
 AESHPC128_WORK_DIR=$(WORK)/aeshpc_hdl_d$(NUM_SHARES)
 
-HDL_ROOT_DIR=../src
+HDL_ROOT_DIR=../hdl
 AESHPC128_HDL_ROOT_DIR=../aeshpc128_src
 GADGETS_SRC = ../../../compress/gadget_library/BIN/ \
 		../../../compress/gadget_library/MSK/ \

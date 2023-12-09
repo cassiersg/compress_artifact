@@ -11,12 +11,12 @@
 // on this source, You must where practicable maintain the Source Location
 // visible on the external case of any product you make using this source.
 
-// Masked AES implementation using HPC2 masking scheme and 32-bit
+// Masked AES implementation using HPC masking scheme and 32-bit
 // architecture.
 `ifndef DEFAULTSHARES
 `define DEFAULTSHARES 2
 `endif
-module aes_enc128_32bits_hpc2
+module aes_enc128_32bits_hpc
 #
 (
     parameter d = `DEFAULTSHARES,

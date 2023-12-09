@@ -37,7 +37,6 @@ def get_results_data(results_dir):
     for f in results_dir.glob(globstr):
         area = parse_report(f)
         r = re.search(r"(\w+)-d(\d+)-L(\d+)\.yosys-area\.json", str(f))
-        print(r,area,globstr,f)
         design = r.group(1)
         shares = int(r.group(2))
         lat = int(r.group(3))
