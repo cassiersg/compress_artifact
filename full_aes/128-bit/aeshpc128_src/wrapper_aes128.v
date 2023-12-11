@@ -14,7 +14,7 @@ module wrapper_aes128
 #
 (
     parameter d = `DEFAULTSHARES,
-    parameter PRNG_MAX_UNROLL = 128 
+    parameter PRNG_MAX_UNROLL = 512
 )
 (
     // Global

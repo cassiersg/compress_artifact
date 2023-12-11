@@ -20,7 +20,7 @@ module aes_enc128_32bits_hpc2
 #
 (
     parameter d = `DEFAULTSHARES,
-    parameter PRNG_MAX_UNROLL = 128 
+    parameter PRNG_MAX_UNROLL = 512
 )
 (
     clk,
