@@ -5,7 +5,7 @@ DS=1 2 3 4
 
 MODULE_NAME=$(basename $(notdir $(CIRCUIT)))
 SRC_VERILOG=$(WORK)/$(MODULE_NAME).v
-AREA_REPORT = $(WORK)/$(MODULE_NAME)_areas.csv
+AREA_REPORT = $(WORK)/$(MODULE_NAME)_area.csv
 
 .PHONY: all clean
 

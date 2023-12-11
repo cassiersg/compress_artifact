@@ -14,8 +14,16 @@ def parse_reports(reports, module):
         order = int(order[1:])
         areaum2 = float(l['design']['area'])
         area_ge = areaum2/GE
-        area_rnd_ge = 33.1708333 * 34 * order * (order+1)
-        yield {'design': module, 'nshares': order+1, 'area_ge': area_ge, 'area_ge_wrnd': area_ge + area_rnd_ge}
+        rnd_bits = 34 * order * (order+1) # 34 HPC3 gadgets
+        area_rnd_ge = 33.1708333 * rnd_bits # constant manually copied
+        yield {
+                'design': module,
+                'nshares': order+1,
+                'area_ge': area_ge,
+                'area_ge_wrng': area_ge + area_rnd_ge,
+                'solve_time': '',
+                'rnd_bits': rnd_bits,
+            }
 
 
 def cli():
@@ -30,7 +38,7 @@ def main():
     args = cli().parse_args()
     res = list(parse_reports(args.reports, args.module))
     with open(args.outcsv, 'w') as csvfile:
-        fields=['design', 'nshares', 'area_ge', 'area_ge_wrnd']
+        fields=['design', 'nshares', 'area_ge', 'area_ge_wrng', 'solve_time', 'rnd_bits']
         writer = csv.DictWriter(csvfile, fieldnames=fields)
         writer.writeheader()
         writer.writerows(res)

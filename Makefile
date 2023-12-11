@@ -49,11 +49,12 @@ skinny_sbox_serialized:
 
 ADDERS= RC3mod KSmod sklanskymod BKmod
 ADDER_DIR=$(abspath ./work/adder_circuits)
-adder_circuits:
-	mkdir -p $(ADDER_DIR)
-	${PYTHON_VE}; set -e; $(foreach ADDER,$(ADDERS), \
-		python compress/scripts/generate_adder_circuit.py -n 32 --type $(ADDER) --out $(ADDER_DIR)/$(ADDER)_32.txt; \
-	)
+ADDER_FILES=$(foreach ADDER,$(ADDERS),$(ADDER_DIR)/$(ADDER)_32.txt)
+$(ADDER_FILES): $(ADDER_DIR)/%_32.txt: compress/scripts/generate_adder_circuit.py
+	mkdir -p $(dir $@)
+	${PYTHON_VE}; python $< -n 32 --type $* --out $@
+
+adder_circuits: $(ADDER_FILES)
 
 adders_compress: $(VE_INSTALLED) adder_circuits
 	# Generate adder designs reported in the paper.
