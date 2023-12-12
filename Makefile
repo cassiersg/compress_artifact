@@ -59,9 +59,9 @@ adder_circuits: $(ADDER_FILES)
 adders_compress: $(VE_INSTALLED) adder_circuits
 	# Generate adder designs reported in the paper.
 	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/RC3mod_32.txt LATS="31 32" DS="2 3" area
-	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/KSmod_32.txt LATS="5 12" DS="2 3" area
-	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/sklanskymod_32.txt LATS="6 12" DS="2 3" area
-	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/BKmod_32.txt LATS="9 18" DS="2 3" area
+	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/KSmod_32.txt LATS="5 6 7 8" DS="2 3" area
+	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/sklanskymod_32.txt LATS="6 7" DS="2 3" area
+	${PYTHON_VE}; make -C compress WORK=$(abspath ./work/adders) CIRCUIT=$(ADDER_DIR)/BKmod_32.txt LATS="9 10" DS="2 3" area
 
 adders_handcrafting: $(VE_INSTALLED) adder_circuits
 	${PYTHON_VE}; set -e; $(foreach ADDER,$(ADDERS), \
