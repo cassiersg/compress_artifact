@@ -44,6 +44,10 @@ sbox_agema:
 skinny_sbox_serialized:
 	make -C skinny_serialized_sbox WORK=$(abspath work/skinny_serialized)
 
+# canright compress
+canright_aes_sbox_opt: $(VE_INSTALLED)
+	# Generate AES S-box designs reported in the paper.
+	${PYTHON_VE}; make -C canright LATS="4 5 6" DS="2 3 4 5" WORK=../work/$@ area
 
 ### Adders ###
 
