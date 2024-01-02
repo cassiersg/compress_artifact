@@ -5,7 +5,7 @@ DS=1 2 3 4
 
 MODULE_NAME=$(basename $(notdir $(CIRCUIT)))
 SRC_VERILOG=$(WORK)/$(MODULE_NAME).v
-AREA_REPORT = $(WORK)/$(MODULE_NAME)_areas.csv
+AREA_REPORT = $(WORK)/$(MODULE_NAME)_area.csv
 
 .PHONY: all clean
 
@@ -52,7 +52,7 @@ $(SRC_VERILOG): $(CIRCUIT)
 	python3 circ2v.py --circuit $< --out $@
 
 $(AREA_REPORT): $(ALL_AREAS) | summarize_areas.py
-	python3 summarize_areas.py --outcsv=$@ $^
+	python3 summarize_areas.py --module $(MODULE_NAME) --outcsv=$@ $^
 
 clean:
 	-rm -r $(WORK) / 2> /dev/null
