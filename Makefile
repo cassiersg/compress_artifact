@@ -22,7 +22,7 @@ $(VE_INSTALLED): $(VE)/pyvenv.cfg
 aes_sbox_compress: aes_sbox_opt aes_sbox_sep aes_sbox_base
 aes_sbox_opt aes_sbox_sep aes_sbox_base: aes_sbox_%: $(VE_INSTALLED)
 	# Generate AES S-box designs reported in the paper.
-	${PYTHON_VE}; make -C compress CIRCUIT=circuits/aes_bp.txt LATS="4 5 6" DS="2 3 4 5" GADGETS_CONFIG=gadget_library/gadgets_$*.toml WORK=../work/aes_$* area
+	${PYTHON_VE}; TB_CHECK_REF=aes_sbox make -C compress CIRCUIT=circuits/aes_bp.txt LATS="4 5 6" DS="2 3 4 5" GADGETS_CONFIG=gadget_library/gadgets_$*.toml WORK=../work/aes_$* area
 
 skinny_sbox_compress: skinny_sbox_opt skinny_sbox_sep skinny_sbox_base
 skinny_sbox_opt skinny_sbox_sep skinny_sbox_base: skinny_sbox_%: $(VE_INSTALLED)
@@ -47,7 +47,7 @@ skinny_sbox_serialized:
 # canright compress
 canright_aes_sbox_opt: $(VE_INSTALLED)
 	# Generate AES S-box designs reported in the paper.
-	${PYTHON_VE}; make -C canright LATS="4 5 6" DS="2 3 4 5" WORK=../work/$@ area
+	${PYTHON_VE}; TB_CHECK_EVAL=0 TB_CHECK_REF=aes_sbox make -C canright LATS="4 5 6" DS="2 3 4 5" WORK=../work/$@ area
 
 ### Adders ###
 

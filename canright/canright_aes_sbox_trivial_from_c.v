@@ -126,12 +126,12 @@ module G256_newbasis_X2S(input wire [7:0] x, output wire [7:0] z);
 endmodule
 
 // AES S-box
-module Sbox(input wire [7:0] x, output wire [7:0] z);
+module Sbox(input wire [7:0] i, output wire [7:0] o);
     wire [7:0] t, u, v;
-    G256_newbasis_A2X a2x(.x(x), .z(t));
+    G256_newbasis_A2X a2x(.x(i), .z(t));
     G256_inv inv(.x(t), .z(u));
     G256_newbasis_X2S x2s(.x(u), .z(v));
-    assign z = v ^ 8'h63;
+    assign o = v ^ 8'h63;
 endmodule
 
 /*
@@ -140,7 +140,7 @@ endmodule
 module top();
     reg [7:0] x;
     wire [7:0] z;
-    Sbox sbox(.x(x), .z(z));
+    Sbox sbox(.i(x), .o(z));
     integer i, j;
     initial begin
         $dumpfile("canright_sbox.vcd");
