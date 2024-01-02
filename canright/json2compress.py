@@ -122,7 +122,7 @@ def process_inst_G16mul(cell_inst, varmap, lines_out, index):
     varn_y = [fetch_variable_name(varmap, iny_indexes[i], index) for i in range(4)]
     varn_z = [fetch_variable_name(varmap, outz_indexes[i], index) for i in range(4)]
     # Create the line
-    line = "({}, {}, {}, {}) = G16_mul({}, {}, {}, {})".format(
+    line = "({}, {}, {}, {}) = G16_mul({}, {}, {}, {}, {}, {}, {}, {})".format(
             *varn_z,
             *varn_x,
             *varn_y,
