@@ -18,10 +18,11 @@ endgenerate
 
 // Sbox for last column
 wire [7:0] lcol_SB [3:0];
-sbox_bp_umsk lcol_SB0(.in(k_bytes_in[12]),.out(lcol_SB[0]));
-sbox_bp_umsk lcol_SB1(.in(k_bytes_in[13]),.out(lcol_SB[1]));
-sbox_bp_umsk lcol_SB2(.in(k_bytes_in[14]),.out(lcol_SB[2]));
-sbox_bp_umsk lcol_SB3(.in(k_bytes_in[15]),.out(lcol_SB[3]));
+sbox_bp_umsk lcol_SB0(.in(k_bytes_in[12]),.out(lcol_SB[3]));
+sbox_bp_umsk lcol_SB1(.in(k_bytes_in[13]),.out(lcol_SB[0]));
+sbox_bp_umsk lcol_SB2(.in(k_bytes_in[14]),.out(lcol_SB[1]));
+sbox_bp_umsk lcol_SB3(.in(k_bytes_in[15]),.out(lcol_SB[2]));
+
 
 // RCON addition
 wire [7:0] lcol_SB_RCON[3:0];

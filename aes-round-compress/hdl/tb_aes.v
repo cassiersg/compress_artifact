@@ -26,6 +26,16 @@ initial begin
 
     #T;
 
+    if (state_out !== 128'h4c260628_7ad3f848_9a19cbe0_e5816604) begin
+        $display("FAILURE in state_out");
+        $finish();
+    end 
+    if (key_out !== 128'h05766c2a_3939a323_b12c5488_17fefaa0) begin
+        $display("FAILURE in key_out");
+        $finish();
+    end 
+
+
     $finish();
     
 end
