@@ -1,0 +1,1 @@
+../canright/json2compress.py

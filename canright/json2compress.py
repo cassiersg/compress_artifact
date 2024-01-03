@@ -129,6 +129,18 @@ def process_inst_G16mul(cell_inst, varmap, lines_out, index):
             )
     lines_out.append(line)
 
+def process_inst_AND(cell_inst, varmap, lines_out, index):
+    ina_index = cell_inst['connections']['A'][0]
+    inb_index = cell_inst['connections']['B'][0]
+    outy_index = cell_inst['connections']['Y'][0]
+    # Fetch variable name
+    varn_ina = fetch_variable_name(varmap, ina_index, index)
+    varn_inb = fetch_variable_name(varmap, inb_index, index)
+    varn_outy = fetch_variable_name(varmap, outy_index, index)
+    # Create the line
+    line = "{} = {} & {}".format(varn_outy, varn_ina, varn_inb)
+    lines_out.append(line)
+
 def process_instance(cell_name, cell_inst, varmap, lines_out, index):
     inst_type = cell_inst['type']
     if inst_type == '$_NOT_':
@@ -139,6 +151,8 @@ def process_instance(cell_name, cell_inst, varmap, lines_out, index):
         process_inst_G4mul(cell_inst, varmap, lines_out, index)
     elif inst_type == "G16_mul":
         process_inst_G16mul(cell_inst, varmap, lines_out, index)
+    elif inst_type == "$_AND_":
+        process_inst_AND(cell_inst, varmap, lines_out, index)
     else:
         raise ValueError("Cell type '{}' not handled".format(inst_type))
 
@@ -180,6 +194,5 @@ if __name__ == "__main__":
     with open(args.compress_file, 'w') as f:
         f.write("\n".join(circuit_compress_lines)) 
 
-    print(variables_map)
 
     
