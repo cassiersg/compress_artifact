@@ -52,3 +52,39 @@ assign out2 = in0 ^ in1 ^ inX2[2] ^ inX3[3];
 assign out3 = inX3[0] ^ in1 ^ in2 ^ inX2[3];
 
 endmodule
+
+// Perform the MC for the full state
+module MC_umsk(
+    input [127:0] state_in,
+    output [127:0] state_out
+);
+
+// Byte representation
+wire [7:0] state_in_bytes [15:0];
+wire [7:0] state_out_bytes [15:0];
+genvar i;
+generate
+for(i=0; i<16;i=i+1) begin: state_byte
+    assign state_in_bytes[i] = state_in[8*i +: 8];
+    assign state_out[8*i +: 8] = state_out_bytes[i];
+end
+endgenerate
+
+// Apply MC on every columns
+generate
+for(i=0;i<4;i=i+1) begin: colMC
+    MC_single_column MC_mod(
+        .in0(state_in_bytes[0+4*i]),
+        .in1(state_in_bytes[1+4*i]),
+        .in2(state_in_bytes[2+4*i]),
+        .in3(state_in_bytes[3+4*i]),
+        .out0(state_out_bytes[0+4*i]),
+        .out1(state_out_bytes[1+4*i]),
+        .out2(state_out_bytes[2+4*i]),
+        .out3(state_out_bytes[3+4*i])
+    );
+end
+endgenerate
+
+
+endmodule

@@ -47,7 +47,8 @@ wire t25f = t20f ^ t17f;
 wire t26f = t3f ^ t16f;
 wire t27f = t1f ^ t12f;
 
-// Top linear transform wire t1 = t1f;
+// Top lineaar transform muxest1 = inverse ? t1b : t1f
+wire t1 = t1f;
 wire t2 = t2f;
 wire t3 = t3f;
 wire t4 = t4f;
