@@ -36,23 +36,30 @@ class Counter:
 def parse_ports(topmod, varmap, txt_out):
     # Add input/output declaration
     top_ports=topmod['ports']
+    input_ports = []
+    output_ports = []
     for pname in top_ports:
         # Get the port
         port = top_ports[pname]
+        port_direction = port["direction"]
         # Keep track of port sigs to create the IO declarations
         list_port_sigs = []
         # Add to map the corresponding bits
         for bi,be in enumerate(port['bits']):
             variables_map[be] = "{}{}".format(pname,bi)
             list_port_sigs += [variables_map[be]]
-        # Create the INPUT/OUTPUT declaration
-        str_port_sigs = ft.reduce(lambda a, b: a+' '+b, list_port_sigs)
-        if port['direction']=='input':
-            txt_out.append("INPUTS {}".format(str_port_sigs))
-        elif port['direction']=='output':
-            txt_out.append("OUTPUTS {}".format(str_port_sigs))
+        # Append to corresponding port
+        if port_direction == "input":
+            input_ports += list_port_sigs
+        elif port_direction == "output":
+            output_ports += list_port_sigs
         else:
-            raise ValueError("Direction not handled")
+            raise ValueError("Port direction not handled")
+    # Create the INPUT/OUTPUT declaration
+    input_str_port_sigs = ft.reduce(lambda a, b: a+' '+b, input_ports)
+    output_str_port_sigs = ft.reduce(lambda a, b: a+' '+b, output_ports)
+    txt_out.append("INPUTS {}".format(input_str_port_sigs))
+    txt_out.append("OUTPUTS {}".format(output_str_port_sigs))
             
 def filter_name(name):
     to_remove = ['$','.',':']

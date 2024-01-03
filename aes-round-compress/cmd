@@ -1,0 +1,1 @@
+python ../compress/scripts/compress.py --circuit work/aes_round.txt --latency 5 --out work/aes_round.v -d 2 --gadgets-area-csv ../work/canright_aes_sbox_opt/gadget_area/areas_d2.csv --rng-area-txt ../work/canright_aes_sbox_opt/rng_area/area_ge.txt --gadgets-config ../compress/gadget_library/gadgets_opt.toml --outstats work/stats
