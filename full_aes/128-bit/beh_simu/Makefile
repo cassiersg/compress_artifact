@@ -30,7 +30,8 @@ simu-build:
 	    -o $(WORK)/simu-exec-$(TB_TARGET) \
 		-Pd=$(NUM_SHARES) \
 	    -D DEFAULTRND=1 \
-	    -D SHARES=$(NUM_SHARES)
+	    -D SHARES=$(NUM_SHARES) \
+	    -D LATENCY=$(LATENCY)
 
 clean:
 	-rm -r $(WORK) 

@@ -7,6 +7,7 @@ module tb_mskaes
 `endif
 
 localparam d = `SHARES;
+localparam LATENCY = `LATENCY;
 
 localparam T=2.0;
 localparam Td = T/2.0;
@@ -49,8 +50,8 @@ always@(*) #Td clk<=~clk;
 
 // Dut
 `ifdef behavioral
-MSKaes_128bits 
-#(.d(d))
+MSKaes_128bits_round_based 
+#(.d(d),.LATENCY(LATENCY))
 dut(
     .nrst(nrst),
     .clk(clk),

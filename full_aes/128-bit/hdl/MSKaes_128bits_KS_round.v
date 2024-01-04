@@ -71,6 +71,7 @@ for(i=0;i<4;i=i+1) begin: sb_inst
 end
 endgenerate
 
+
 // From Sbox rotation and RCON addition
 wire [8*d-1:0] sh_lcol_SB_RCON [3:0];
 MSKxor #(.d(d), .count(8))
@@ -83,26 +84,27 @@ assign sh_lcol_SB_RCON[1] = sh_lcol_SB[2];
 assign sh_lcol_SB_RCON[2] = sh_lcol_SB[3];
 assign sh_lcol_SB_RCON[3] = sh_lcol_SB[0];
 
+
 // Create the pipeline for the key with the parametrized latency
 genvar j;
 wire [8*d-1:0] sh_key_byte_delayed [15:0];
 generate
 for(i=0;i<16;i=i+1) begin: key_byte_pipeline
     for(j=0;j<LATENCY;j=j+1) begin: stage
-        wire [8*d-1:0] Q,D;
+        wire [8*d-1:0] D,Q;
         MSKreg #(.d(d),.count(8))
         reg_stage(
             .clk(clk),
-            .in(Q),
-            .out(D)
+            .in(D),
+            .out(Q)
         );
         if (j==0) begin
-            assign Q = sh_key_in[i];
+            assign D = sh_byte_in[i];
         end else begin
-            assign Q = stage[j-1].D;
+            assign D = stage[j-1].Q;
         end
     end
-    assign sh_key_byte_delayed[i] = stage[LATENCY-1].D;
+    assign sh_key_byte_delayed[i] = stage[LATENCY-1].Q;
 end
 endgenerate
 
@@ -148,3 +150,4 @@ for(i=0;i<3;i=i+1) begin: column_add
     end
 end
 endgenerate
+endmodule

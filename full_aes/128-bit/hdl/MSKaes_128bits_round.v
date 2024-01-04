@@ -41,9 +41,9 @@ KS_mod(
     .sh_key_in(sh_key_in),
     .sh_key_out(sh_key_out),
     .sh_RCON_in(sh_RCON),
-    .rnd_bus0w(rnd_bus0w[4*rnd_bus0 +: 16*rnd_bus0],
-    .rnd_bus1w(rnd_bus1w[4*rnd_bus1 +: 16*rnd_bus1],
-    .rnd_bus2w(rnd_bus2w[4*rnd_bus2 +: 16*rnd_bus2]
+    .rnd_bus0w(rnd_bus0w[0 +: 4*rnd_bus0]),
+    .rnd_bus1w(rnd_bus1w[0 +: 4*rnd_bus1]),
+    .rnd_bus2w(rnd_bus2w[0 +: 4*rnd_bus2])
 );
 
 // AK
@@ -62,9 +62,9 @@ SB_unit(
     .clk(clk),
     .sh_state_in(sh_postAK),
     .sh_state_out(sh_postSB),
-    .rnd_bus0w(rnd_bus0w[0 +: 16*rnd_bus0]),
-    .rnd_bus1w(rnd_bus1w[0 +: 16*rnd_bus1]),
-    .rnd_bus2w(rnd_bus2w[0 +: 16*rnd_bus2])
+    .rnd_bus0w(rnd_bus0w[4*rnd_bus0 +: 16*rnd_bus0]),
+    .rnd_bus1w(rnd_bus1w[4*rnd_bus1 +: 16*rnd_bus1]),
+    .rnd_bus2w(rnd_bus2w[4*rnd_bus2 +: 16*rnd_bus2])
 );
 
 // SR 

@@ -60,7 +60,7 @@ wire [20*rnd_bus1-1:0] rnd_bus1w;
 wire [20*rnd_bus2-1:0] rnd_bus2w;
 
 // Inner AES core
-MSKaes_128bits
+MSKaes_128bits_round_based
 `ifndef CORE_SYNTHESIZED
 #(
     .d(d)

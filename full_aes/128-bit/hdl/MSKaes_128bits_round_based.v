@@ -1,4 +1,4 @@
-module MSKaes_128bits
+module MSKaes_128bits_round_based
 #
 (
     parameter d=2,
@@ -59,8 +59,8 @@ pipe_control(
     .RCON_delayed(ctrl_RCON_KS),
     .RCON_out(ctrl_RCON_out)
 );
-wire feedback_valid = (RCON_out != 8'h0);
-wire feedback_finish = (RCON_out == 8'h6c);
+wire feedback_valid = (ctrl_RCON_out != 8'h0);
+wire feedback_finish = (ctrl_RCON_out == 8'h6c);
 
 wire [8*d-1:0] round_sh_RCON;
 MSKcst #(.d(d),.count(8))
@@ -73,7 +73,6 @@ cst_RCON(
 wire [128*d-1:0] round_sh_state_in, round_sh_key_in;
 wire [128*d-1:0] round_sh_state_out, round_sh_key_out;
 wire [128*d-1:0] round_sh_state_SR_out, round_sh_state_AK_out;
-wire [8*d-1:0] round_sh_RCON;
 MSKaes_128bits_round #(.d(d),.LATENCY(LATENCY))
 round_logic(
     .clk(clk),
@@ -95,6 +94,7 @@ assign ready = ~feedback_valid;
 ////// Input stage             
 wire [128*d-1:0] to_sh_state, to_sh_key;
 wire [8*d-1:0] to_RCON;
+reg [7:0] from_RCON;
 
 MSKreg #(.d(d),.count(128))
 inreg_state(
@@ -110,15 +110,15 @@ inreg_key(
     .out(round_sh_key_in)
 );
 
-MSKreg #(.d(d),.count(8))
-inreg_rcon(
-    .clk(clk),
-    .in(to_RCON),
-    .out(ctrl_RCON_in)
-);
+always@(posedge clk)
+if (~nrst) begin
+    from_RCON <= 8'h0; 
+end else begin
+    from_RCON <= to_RCON;
+end
 
 // Constant sharing of 0
-wire [12d*d-1:0] sh_zero;
+wire [128*d-1:0] sh_zero;
 MSKcst #(.d(d), .count(128))
 sh_zero_mod(
     .cst(128'b0),
@@ -133,7 +133,7 @@ MSKmux #(.d(d),.count(128))
 mux_state_in(
     .sel(fetch_in),
     .in_true(sh_plaintext),
-    .in_false(sh_zero);
+    .in_false(sh_zero),
     .out(sh_state_tmp)
 );
 
@@ -142,32 +142,32 @@ MSKmux #(.d(d),.count(128))
 mux_key_in(
     .sel(fetch_in),
     .in_true(sh_key),
-    .in_false(sh_zero);
+    .in_false(sh_zero),
     .out(sh_key_tmp)
 );
 
 wire [128*d-1:0] sh_feedback_state_choice;
 MSKmux #(.d(d),.count(128))
-mux_feedback_state(
+mux_feedback_choice(
     .sel(feedback_finish),
     .in_true(round_sh_state_SR_out),
-    .in_false(round_sh_state_out);
+    .in_false(round_sh_state_out),
     .out(sh_feedback_state_choice)
 );
 
 MSKmux #(.d(d),.count(128))
-mux_state_in(
+mux_feedback_state(
     .sel(feedback_valid),
     .in_true(sh_feedback_state_choice),
-    .in_false(sh_state_tmp);
+    .in_false(sh_state_tmp),
     .out(to_sh_state)
 );
 
 MSKmux #(.d(d),.count(128))
-mux_key_in(
+mux_feedback_key(
     .sel(feedback_valid),
     .in_true(round_sh_key_out),
-    .in_false(sh_key_tmp);
+    .in_false(sh_key_tmp),
     .out(to_sh_key)
 );
 
@@ -175,6 +175,7 @@ mux_key_in(
 wire fetch_feedback_RCON = feedback_valid & (~feedback_finish);
 wire [7:0] RCON_tmp = fetch_in ? 8'h01 : 8'h0;
 assign to_RCON = fetch_feedback_RCON ? ctrl_RCON_out : RCON_tmp; 
+assign ctrl_RCON_in = from_RCON;
 
 // TODO add internal cleaning mux to round logic  
 
@@ -191,7 +192,7 @@ assign cipher_valid = reg_cipher_valid;
 MSKmux #(.d(d),.count(128))
 mux_ciphervalid(
     .sel(cipher_valid),
-    .in_true(round_sh_state_SR_out),
+    .in_true(round_sh_state_AK_out),
     .in_false(sh_zero),
     .out(sh_ciphertext)
 );
