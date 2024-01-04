@@ -49,6 +49,11 @@ canright_aes_sbox_opt: $(VE_INSTALLED)
 	# Generate AES S-box designs reported in the paper.
 	${PYTHON_VE}; TB_CHECK_EVAL=0 TB_CHECK_REF=aes_sbox make -C canright LATS="4 5 6" DS="2 3 4 5" WORK=../work/$@ area
 
+# AES round with compress
+aes_round_compress: $(VE_INSTALLED)
+	# Generate masked AES round (with compress) designs reported in the paper 
+	${PYTHON_VE}; make -C aes-round-compress LATS="4" DS="2 3 4 5" WORK=../work/$@ area 
+
 ### Adders ###
 
 ADDERS= RC3mod KSmod sklanskymod BKmod
