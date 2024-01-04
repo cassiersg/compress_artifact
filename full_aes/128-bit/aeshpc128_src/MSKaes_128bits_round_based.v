@@ -3,7 +3,7 @@ module MSKaes_128bits_round_based
 #
 (
     parameter d=2,
-    parameter LATENCY = 4
+    parameter LATENCY = 6
 )
 (
     // Global
@@ -17,12 +17,13 @@ module MSKaes_128bits_round_based
     sh_key,
     sh_ciphertext,
     // Randomness busses (required for the Sboxes)
-    rnd_bus0w,
-    rnd_bus1w,
-    rnd_bus2w
+    rnd_bus0,
+    rnd_bus2,
+    rnd_bus3,
+    rnd_bus4
 );
 
-`include "aes_bp.vh"
+`include "MSKand_hpc2.vh"
 
 // IOs ports
 (* fv_type="control" *)
@@ -40,15 +41,18 @@ output cipher_valid;
 input [128*d-1:0] sh_plaintext;
 (* fv_type="sharing", fv_latency=0, fv_count=128 *)
 input [128*d-1:0] sh_key;
-(* fv_type="sharing", fv_latency=51, fv_count=128 *)
+(* fv_type="sharing", fv_latency=71, fv_count=128 *)
 output [128*d-1:0] sh_ciphertext;
 
-(* fv_type="random", fv_count=0, fv_rnd_count_0=20*rnd_bus0 *)
-input [20*rnd_bus0-1:0] rnd_bus0w;
-(* fv_type="random", fv_count=0, fv_rnd_count_0=20*rnd_bus1 *)
-input [20*rnd_bus1-1:0] rnd_bus1w;
-(* fv_type="random", fv_count=0, fv_rnd_count_0=20*rnd_bus2 *)
-input [20*rnd_bus2-1:0] rnd_bus2w;
+(* fv_type="random", fv_count=0, fv_rnd_count_0=20*9*hpc2rnd *)
+input [20*9*hpc2rnd-1:0] rnd_bus0;
+(* fv_type="random", fv_count=0, fv_rnd_count_0=20*3*hpc2rnd *)
+input [20*3*hpc2rnd-1:0] rnd_bus2;
+(* fv_type="random", fv_count=0, fv_rnd_count_0=20*4*hpc2rnd *)
+input [20*4*hpc2rnd-1:0] rnd_bus3;
+(* fv_type="random", fv_count=0, fv_rnd_count_0=20*18*9*hpc2rnd *)
+input [20*18*hpc2rnd-1:0] rnd_bus4;
+
 
 ///// Control pipe for the round
 wire [7:0] ctrl_RCON_in, ctrl_RCON_KS, ctrl_RCON_out;
@@ -85,9 +89,10 @@ round_logic(
     .sh_key_out(round_sh_key_out),
     .sh_state_SR_out(round_sh_state_SR_out),
     .sh_state_AK_out(round_sh_state_AK_out),
-    .rnd_bus0w(rnd_bus0w),
-    .rnd_bus1w(rnd_bus1w),
-    .rnd_bus2w(rnd_bus2w),
+    .rnd_bus0(rnd_bus0),
+    .rnd_bus2(rnd_bus2),
+    .rnd_bus3(rnd_bus3),
+    .rnd_bus4(rnd_bus4),
     .cleaning_on(round_cleaning_on)
 );
 

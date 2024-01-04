@@ -18,7 +18,6 @@ module MSKaes_128bits_SB
     rnd_bus4
 );
 
-
 `include "MSKand_hpc2.vh"
 
 // IOs

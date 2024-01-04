@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-module tb_mskaes 
+module tb_mskaes_aeshpc 
 ();
 
 `ifndef SHARES
@@ -7,12 +7,11 @@ module tb_mskaes
 `endif
 
 localparam d = `SHARES;
-localparam LATENCY = `LATENCY;
 
 localparam T=2.0;
 localparam Td = T/2.0;
 
-`include "aes_bp.vh"
+`include "MSKand_hpc2.vh"
 
 reg clk, nrst, valid_in;
 wire ready;
@@ -38,9 +37,16 @@ pshare(
     .out(sh_plaintext)
 );
 
-reg [20*rnd_bus0-1:0] rnd_bus0w;
-reg [20*rnd_bus1-1:0] rnd_bus1w;
-reg [20*rnd_bus2-1:0] rnd_bus2w;
+localparam rnd0 = 9*hpc2rnd;
+localparam rnd2 = 3*hpc2rnd;
+localparam rnd3 = 4*hpc2rnd;
+localparam rnd4 = 18*hpc2rnd;
+
+reg [20*rnd0-1:0] rnd_bus0;
+reg [20*rnd2-1:0] rnd_bus2;
+reg [20*rnd3-1:0] rnd_bus3;
+reg [20*rnd4-1:0] rnd_bus4;
+
 reg prng_start_reseed;
 wire prng_out_valid;
 
@@ -50,7 +56,7 @@ always@(*) #Td clk<=~clk;
 // Dut
 `ifdef behavioral
 MSKaes_128bits_round_based 
-#(.d(d),.LATENCY(LATENCY))
+#(.d(d))
 dut(
     .nrst(nrst),
     .clk(clk),
@@ -60,27 +66,12 @@ dut(
     .sh_plaintext(sh_plaintext),
     .sh_key(sh_key),
     .sh_ciphertext(sh_ciphertext),
-    .rnd_bus0w(rnd_bus0w),
-    .rnd_bus1w(rnd_bus1w),
-    .rnd_bus2w(rnd_bus2w)
+    .rnd_bus0(rnd_bus0),
+    .rnd_bus2(rnd_bus2),
+    .rnd_bus3(rnd_bus3),
+    .rnd_bus4(rnd_bus4)
 );
 assign prng_out_valid = 1'b1;
-`else
-wrapper_aes128
-dut(
-    .nrst(nrst),
-    .clk(clk),
-    .valid_in(valid_in),
-    .ready(ready),
-    .cipher_valid(cipher_valid),
-    .sh_plaintext(sh_plaintext),
-    .sh_key(sh_key),
-    .sh_ciphertext(sh_ciphertext),
-    .prng_seed(80'b0),
-    .prng_start_reseed(prng_start_reseed),
-    .prng_out_ready(1'b1),
-    .prng_out_valid(prng_out_valid)
-);
 `endif
 
 genvar i;
@@ -94,14 +85,17 @@ endgenerate
 // Randomness
 integer seed = 0;
 generate 
-for (i=0;i<20*rnd_bus0;i=i+1) begin: rnd_b_b0
-    always@(posedge clk) rnd_bus0w[i] <= $random(seed);
+for (i=0;i<20*rnd0;i=i+1) begin: rnd_b_b0
+    always@(posedge clk) rnd_bus0[i] <= $random(seed);
 end
-for (i=0;i<20*rnd_bus1;i=i+1) begin: rnd_b_b2
-    always@(posedge clk) rnd_bus1w[i] <= $random(seed);
+for (i=0;i<20*rnd2;i=i+1) begin: rnd_b_b2
+    always@(posedge clk) rnd_bus2[i] <= $random(seed);
 end
-for (i=0;i<20*rnd_bus2;i=i+1) begin: rnd_b_b3
-    always@(posedge clk) rnd_bus2w[i] <= $random(seed);
+for (i=0;i<20*rnd3;i=i+1) begin: rnd_b_b3
+    always@(posedge clk) rnd_bus3[i] <= $random(seed);
+end
+for (i=0;i<20*rnd4;i=i+1) begin: rnd_b_b4
+    always@(posedge clk) rnd_bus4[i] <= $random(seed);
 end
 endgenerate
 
@@ -127,7 +121,7 @@ initial begin
 
     // Dumping 
     $dumpfile(`VCD_PATH);
-    $dumpvars(0,tb_mskaes);
+    $dumpvars(0,tb_mskaes_aeshpc);
 
     // Init
     clk = 1;
@@ -135,9 +129,10 @@ initial begin
     valid_in = 0;
     umsk_plaintext = 128'h340737e0a29831318d305a88a8f64332;
     umsk_key = 128'h3c4fcf098815f7aba6d2ae2816157e2b;
-    rnd_bus0w = 0;
-    rnd_bus1w = 0;
-    rnd_bus2w = 0;
+    rnd_bus0 = 0;
+    rnd_bus2 = 0;
+    rnd_bus3 = 0;
+    rnd_bus4 = 0;
     prng_start_reseed = 0;
     $display("Ciruit initialized (%d shares).",d);
 

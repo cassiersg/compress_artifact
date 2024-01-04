@@ -3,7 +3,7 @@ module MSKaes_128bits_KS_round
 #
 (
     parameter d = 2,
-    parameter LATENCY = 4
+    parameter LATENCY = 6
 )
 (
     // Global
@@ -13,12 +13,13 @@ module MSKaes_128bits_KS_round
     sh_key_out,
     sh_RCON_in, //expected to be valid at the last cycle of the round
     // Randomness
-    rnd_bus0w,
-    rnd_bus1w,
-    rnd_bus2w
+    rnd_bus0,
+    rnd_bus2,
+    rnd_bus3,
+    rnd_bus4,
 );
 
-`include "aes_bp.vh"
+`include "MSKand_hpc2.vh"
 
 // IOs
 input clk;
@@ -27,9 +28,10 @@ input [128*d-1:0] sh_key_in;
 output [128*d-1:0] sh_key_out;
 input [8*d-1:0] sh_RCON_in;
 
-input [4*rnd_bus0-1:0] rnd_bus0w;
-input [4*rnd_bus1-1:0] rnd_bus1w;
-input [4*rnd_bus2-1:0] rnd_bus2w;
+input [4*9*hpc2rnd-1:0] rnd_bus0;
+input [4*3*hpc2rnd-1:0] rnd_bus2;
+input [4*4*hpc2rnd-1:0] rnd_bus3;
+input [4*18*hpc2rnd-1:0] rnd_bus4;
 
 // Byte matrix representation
 genvar i;
@@ -46,7 +48,7 @@ endgenerate
 wire [8*d-1:0] sh_lcol_SB [3:0];
 generate
 for(i=0;i<4;i=i+1) begin: sb_inst
-    gen_bp_sbox #(.d(d))
+    bp_aes_sbox_msk #(.d(d))
     sbox_unit(
         .clk(clk),
         .i0(sh_byte_in[12+i][0*d +: d]),
@@ -57,9 +59,10 @@ for(i=0;i<4;i=i+1) begin: sb_inst
         .i5(sh_byte_in[12+i][5*d +: d]),
         .i6(sh_byte_in[12+i][6*d +: d]),
         .i7(sh_byte_in[12+i][7*d +: d]),
-        .rnd_bus0w(rnd_bus0w[i*rnd_bus0 +: rnd_bus0]),
-        .rnd_bus1w(rnd_bus1w[i*rnd_bus1 +: rnd_bus1]),
-        .rnd_bus2w(rnd_bus2w[i*rnd_bus2 +: rnd_bus2]),
+        .rnd_bus0(rnd_bus0[i*9*hpc2rnd +: 9*hpc2rnd]),
+        .rnd_bus2(rnd_bus2[i*3*hpc2rnd +: 3*hpc2rnd]),
+        .rnd_bus3(rnd_bus3[i*4*hpc2rnd +: 4*hpc2rnd]),
+        .rnd_bus4(rnd_bus4[i*18*hpc2rnd +: 18*hpc2rnd]),
         .o0(sh_lcol_SB[i][0*d +: d]),
         .o1(sh_lcol_SB[i][1*d +: d]),
         .o2(sh_lcol_SB[i][2*d +: d]),

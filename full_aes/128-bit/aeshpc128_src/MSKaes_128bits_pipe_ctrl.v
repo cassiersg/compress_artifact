@@ -2,7 +2,7 @@
 module MSKaes_128bits_pipe_ctrl
 #
 (
-    parameter LATENCY = 4 
+    parameter LATENCY = 6 
 )
 (
     input clk,

@@ -5,7 +5,7 @@
 
 */ 
 
-// Masked AES implementation using HPC2 masking scheme and 32-bit
+// Masked AES implementation using HPC masking scheme and 128-bit
 // architecture.
 `ifndef DEFAULTSHARES
 `define DEFAULTSHARES 2
@@ -54,7 +54,6 @@ input prng_out_ready;
 output prng_out_valid;
 output prng_busy;
 
-
 localparam rnd0 = 9*hpc2rnd;
 localparam rnd2 = 3*hpc2rnd;
 localparam rnd3 = 4*hpc2rnd;
@@ -66,7 +65,7 @@ wire [20*rnd3-1:0] rnd_bus3;
 wire [20*rnd4-1:0] rnd_bus4;
 
 // Inner AES core
-MSKaes_128bits
+MSKaes_128bits_round_based
 `ifndef CORE_SYNTHESIZED
 #(
     .d(d)
@@ -77,7 +76,7 @@ aes_core(
     .clk(clk),
     .valid_in(valid_in),
     .ready(ready),
-    .cipher_valid(aes_cipher_valid),
+    .cipher_valid(cipher_valid),
     .sh_plaintext(sh_plaintext),
     .sh_key(sh_key),
     .sh_ciphertext(sh_ciphertext),
@@ -108,5 +107,6 @@ assign rnd_bus0 = rnd[0 +: 20*rnd0];
 assign rnd_bus2 = rnd[20*rnd0 +: 20*rnd2];
 assign rnd_bus3 = rnd[20*(rnd0+rnd2) +: 20*rnd3];
 assign rnd_bus4 = rnd[20*(rnd0+rnd2+rnd3) +: 20*rnd4];
+
 
 endmodule

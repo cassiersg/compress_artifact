@@ -3,7 +3,7 @@ module MSKaes_128bits_round_with_cleaning
 #
 (
     parameter d = 2,
-    parameter LATENCY = 4
+    parameter LATENCY = 6
 )
 (
     clk,
@@ -14,13 +14,14 @@ module MSKaes_128bits_round_with_cleaning
     sh_key_out,
     sh_state_SR_out,
     sh_state_AK_out,
-    rnd_bus0w,
-    rnd_bus1w,
-    rnd_bus2w,
+    rnd_bus0,
+    rnd_bus2,
+    rnd_bus3,
+    rnd_bus4,
     cleaning_on
 );
 
-`include "aes_bp.vh"
+`include "MSKand_hpc2.vh"
 
 // Ports
 input clk;
@@ -32,9 +33,10 @@ output [128*d-1:0] sh_key_out;
 output [128*d-1:0] sh_state_SR_out;
 output [128*d-1:0] sh_state_AK_out;
 
-input [20*rnd_bus0-1:0] rnd_bus0w;
-input [20*rnd_bus1-1:0] rnd_bus1w;
-input [20*rnd_bus2-1:0] rnd_bus2w;
+input [20*9*hpc2rnd-1:0] rnd_bus0;
+input [20*3*hpc2rnd-1:0] rnd_bus2;
+input [20*4*hpc2rnd-1:0] rnd_bus3;
+input [20*18*hpc2rnd-1:0] rnd_bus4;
 
 input cleaning_on;
 
@@ -62,9 +64,10 @@ KS_mod(
     .sh_key_in(sh_key_in_cleaned),
     .sh_key_out(sh_key_out),
     .sh_RCON_in(sh_RCON),
-    .rnd_bus0w(rnd_bus0w[0 +: 4*rnd_bus0]),
-    .rnd_bus1w(rnd_bus1w[0 +: 4*rnd_bus1]),
-    .rnd_bus2w(rnd_bus2w[0 +: 4*rnd_bus2])
+    .rnd_bus0(rnd_bus0[0 +: 4*9*hpc2rnd]),
+    .rnd_bus2(rnd_bus2[0 +: 4*3*hpc2rnd]),
+    .rnd_bus3(rnd_bus3[0 +: 4*4*hpc2rnd]),
+    .rnd_bus4(rnd_bus4[0 +: 4*18*hpc2rnd])
 );
 
 // AK
@@ -92,9 +95,10 @@ SB_unit(
     .clk(clk),
     .sh_state_in(sh_postAK_cleaned),
     .sh_state_out(sh_postSB),
-    .rnd_bus0w(rnd_bus0w[4*rnd_bus0 +: 16*rnd_bus0]),
-    .rnd_bus1w(rnd_bus1w[4*rnd_bus1 +: 16*rnd_bus1]),
-    .rnd_bus2w(rnd_bus2w[4*rnd_bus2 +: 16*rnd_bus2])
+    .rnd_bus0(rnd_bus0[4*9*hpc2rnd +: 16*9*hpc2rnd]),
+    .rnd_bus2(rnd_bus2[4*3*hpc2rnd +: 16*3*hpc2rnd]),
+    .rnd_bus3(rnd_bus3[4*4*hpc2rnd +: 16*4*hpc2rnd]),
+    .rnd_bus4(rnd_bus4[4*18*hpc2rnd +: 16*18*hpc2rnd])
 );
 
 // SR 

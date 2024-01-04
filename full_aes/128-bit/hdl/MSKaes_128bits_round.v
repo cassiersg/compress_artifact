@@ -1,3 +1,4 @@
+(* fv_prop = "PINI", fv_strat = "flatten" *)
 module MSKaes_128bits_round
 #
 (

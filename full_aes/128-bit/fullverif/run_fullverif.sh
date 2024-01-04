@@ -7,7 +7,7 @@ HDL_ROOT_DIR=../hdl
 TB_MODULE=tb_mskaes
 TB_DIR=../tb
 TB_PATH=$TB_DIR/$TB_MODULE.v
-MAIN_MODULE=MSKaes_128bits
+MAIN_MODULE=MSKaes_128bits_round_based
 # signal starting the first simulation cycle (i.e. latency == 0 for the main module), name in the testbench
 IN_VALID=valid_in
 # clock signal (in the testbench)
@@ -47,6 +47,7 @@ ${IVERILOG:=iverilog} \
     -D VCD_PATH=\"$VCD_PATH\" \
     -D RES_FILE=\"$WORK/res_$NUM_SHARES.log\" \
     -D FULLVERIF=1 \
+    -D LATENCY=4 \
     -D behavioral \
     $SYNTH_BASE.v $TB_PATH || exit
     #-y $FULLVERIF_LIB_DIR \
