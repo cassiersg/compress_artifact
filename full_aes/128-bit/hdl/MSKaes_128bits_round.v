@@ -12,6 +12,7 @@ module MSKaes_128bits_round
     sh_state_out,
     sh_key_out,
     sh_state_SR_out,
+    sh_state_AK_out,
     rnd_bus0w,
     rnd_bus1w,
     rnd_bus2w
@@ -25,8 +26,9 @@ input [128*d-1:0] sh_state_in;
 input [128*d-1:0] sh_key_in;
 input [8*d-1:0] sh_RCON;
 output [128*d-1:0] sh_state_out;
-output [128*d-1:0] sh_state_SR_out;
 output [128*d-1:0] sh_key_out;
+output [128*d-1:0] sh_state_SR_out;
+output [128*d-1:0] sh_state_AK_out;
 
 input [20*rnd_bus0-1:0] rnd_bus0w;
 input [20*rnd_bus1-1:0] rnd_bus1w;
@@ -36,7 +38,12 @@ input [20*rnd_bus2-1:0] rnd_bus2w;
 MSKaes_128bits_KS_round #(.d(d), .LATENCY(LATENCY))
 KS_mod(
     .clk(clk),
-    .sh_key_in(
+    .sh_key_in(sh_key_in),
+    .sh_key_out(sh_key_out),
+    .sh_RCON_in(sh_RCON),
+    .rnd_bus0w(rnd_bus0w[4*rnd_bus0 +: 16*rnd_bus0],
+    .rnd_bus1w(rnd_bus1w[4*rnd_bus1 +: 16*rnd_bus1],
+    .rnd_bus2w(rnd_bus2w[4*rnd_bus2 +: 16*rnd_bus2]
 );
 
 // AK
@@ -76,5 +83,6 @@ MC_unit(
 );
 
 assign sh_state_SR_out = sh_postSR;
+assign sh_state_AK_out = sh_postAK;
 
 endmodule
