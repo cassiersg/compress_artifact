@@ -35,7 +35,7 @@ initial begin
         $finish();
     end 
 
-
+    $display("SUCCESS");
     $finish();
     
 end

@@ -1,9 +1,9 @@
 
 WORK ?= work
-MODULE_NAME ?= aes_round
+MODULE_NAME ?= aes_round_compress
 YOSYS_NETLIST ?= $(WORK)/$(MODULE_NAME).json
 CIRCUIT=$(WORK)/$(MODULE_NAME).txt
-LATS ?= 4 5 6
+LATS ?= 4
 DS ?= 1 2 3 4
 
 AREA_REPORT = $(WORK)/$(MODULE_NAME)_area.csv

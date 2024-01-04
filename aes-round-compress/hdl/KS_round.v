@@ -1,7 +1,7 @@
 module KS_round(
     input [127:0] kin,
     output [127:0] kout,
-    input [7:0] RCON_in
+    input [7:0] RCON
 );
 
 genvar i;
