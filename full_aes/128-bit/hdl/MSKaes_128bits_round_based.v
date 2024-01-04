@@ -73,7 +73,8 @@ cst_RCON(
 wire [128*d-1:0] round_sh_state_in, round_sh_key_in;
 wire [128*d-1:0] round_sh_state_out, round_sh_key_out;
 wire [128*d-1:0] round_sh_state_SR_out, round_sh_state_AK_out;
-MSKaes_128bits_round #(.d(d),.LATENCY(LATENCY))
+wire round_cleaning_on;
+MSKaes_128bits_round_with_cleaning #(.d(d),.LATENCY(LATENCY))
 round_logic(
     .clk(clk),
     .sh_state_in(round_sh_state_in),
@@ -85,7 +86,8 @@ round_logic(
     .sh_state_AK_out(round_sh_state_AK_out),
     .rnd_bus0w(rnd_bus0w),
     .rnd_bus1w(rnd_bus1w),
-    .rnd_bus2w(rnd_bus2w)
+    .rnd_bus2w(rnd_bus2w),
+    .cleaning_on(round_cleaning_on)
 );
 
 //// Generation of the input control logic 
@@ -177,8 +179,6 @@ wire [7:0] RCON_tmp = fetch_in ? 8'h01 : 8'h0;
 assign to_RCON = fetch_feedback_RCON ? ctrl_RCON_out : RCON_tmp; 
 assign ctrl_RCON_in = from_RCON;
 
-// TODO add internal cleaning mux to round logic  
-
 ///// Cipher valid logic
 reg reg_cipher_valid;
 always@(posedge clk)
@@ -188,6 +188,8 @@ end else begin
     reg_cipher_valid <= feedback_finish;
 end
 assign cipher_valid = reg_cipher_valid;
+
+assign round_cleaning_on = cipher_valid;
 
 MSKmux #(.d(d),.count(128))
 mux_ciphervalid(

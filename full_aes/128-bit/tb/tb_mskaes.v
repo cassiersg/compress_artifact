@@ -117,6 +117,7 @@ end
 ////////
 ////////
 integer f;
+integer cnt;
 initial begin
 `ifndef RES_FILE
     `define RES_FILE "/tmp/__res_simu.txt"
@@ -175,8 +176,9 @@ initial begin
     $fwrite(f,"SUCCESS"); 
     $fclose(f);
 
-    #T;
-    #T;
+    for(cnt=0;cnt<10;cnt=cnt+1) begin
+        #T;
+    end
 
     $finish;
 
