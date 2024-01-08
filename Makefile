@@ -40,7 +40,7 @@ sbox_handcrafting: $(VE_INSTALLED)
 sbox_agema:
 	make -C agema CIRCUIT=../compress/circuits/aes_bp.txt WORK=$(abspath work/aes_agema)
 	make -C agema CIRCUIT=../compress/circuits/skinny8.txt WORK=$(abspath work/skinny_agema)
-	make -C agema_direct WORK=$(abspath work/aes_agema_canright)
+	make -C agema_direct WORK=$(abspath work/aes_agema_canright) MODULE_NAME=sbox SRC_VERILOG=$(abspath agema_direct/sbox_canright.v)
 
 skinny_sbox_serialized:
 	make -C skinny_serialized_sbox WORK=$(abspath work/skinny_serialized)
