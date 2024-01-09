@@ -218,6 +218,7 @@ initial begin
 
     // Init delay 
     #(wait_delay); 
+    #(init_delay);
 
     // Reset sequence
     syn_rst = 1;

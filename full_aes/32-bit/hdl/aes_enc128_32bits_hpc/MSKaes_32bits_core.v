@@ -231,7 +231,7 @@ for(i=0;i<4;i=i+1) begin: sbox_isnt
         .rnd_bus0w(rnd_bus0w[i*rnd_bus0 +: rnd_bus0]),
         .rnd_bus1w(rnd_bus1w[i*rnd_bus1 +: rnd_bus1]),
         .rnd_bus2w(rnd_bus2w[i*rnd_bus2 +: rnd_bus2]),
-`ifdef
+`ifdef CANRIGHT_SBOX
         .rnd_bus3w(rnd_bus3w[i*rnd_bus3 +: rnd_bus3]),
 `endif
         .o0(bytes_from_SB[i][0*d +: d]),

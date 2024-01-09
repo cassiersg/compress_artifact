@@ -15,6 +15,9 @@ TV_FILE_PREF=ECBKeySbox128
 #TV_FILE_PREF=ECBVarKey128
 #TV_FILE_PREF?=ECBVarTxt128
 
+WORK_DIR_BP = $(WORK)/aesbp
+WORK_DIR_CANRIGHT = $(WORK)/aescanright
+
 ###########################
 KATIN=${TV_DIR}/${TV_FILE_PREF}.rsp
 TVIN=${DIR_GENERATED}/TV_${TV_FILE_PREF}_in.rsp
@@ -28,23 +31,43 @@ ${TVIN}:
 
 tv: ${TVIN}
 
-simu: ${TVIN} simu-build
-	vvp $(WORK)/simu-exec-$(TB_TARGET)
-
 wave:
 	gtkwave $(WORK)/log-$(TB_TARGET).vcd waves-$(TB_TARGET).gtkw
 
-simu-build:
-	mkdir -p $(WORK)
-	OUT_DIR=$(WORK)/hdl NUM_SHARES=$(NUM_SHARES) LATENCY=$(LATENCY) $(HDL_ROOT_DIR)/gather_sources.sh
-	cp $(TB_DIR)/* $(WORK)/hdl 
+simu-bp: ${TVIN} simu-bp-build
+	vvp $(WORK_DIR_BP)/simu-exec-$(TB_TARGET)
+
+simu-bp-build:
+	mkdir -p $(WORK_DIR_BP)
+	OUT_DIR=$(WORK_DIR_BP)/hdl NUM_SHARES=$(NUM_SHARES) LATENCY=$(LATENCY) $(HDL_ROOT_DIR)/gather_sources.sh
+	cp $(TB_DIR)/* $(WORK_DIR_BP)/hdl 
 	iverilog \
-	    -y $(WORK)/hdl \
-	    -I $(WORK)/hdl \
+	    -y $(WORK_DIR_BP)/hdl \
+	    -I $(WORK_DIR_BP)/hdl \
 	    -D TV_IN=\"${TVIN}\" \
 	    -D TV_OUT=\"${TVOUT}\" \
 	    $(TB_FILE) \
-	    -o $(WORK)/simu-exec-$(TB_TARGET) \
+	    -o $(WORK_DIR_BP)/simu-exec-$(TB_TARGET) \
+		-Pd=$(NUM_SHARES) \
+	    -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\" \
+		-D DEFAULTRND=1 \
+		-D behavioral
+
+simu-canright: ${TVIN} simu-canright-build
+	vvp $(WORK_DIR_CANRIGHT)/simu-exec-$(TB_TARGET)
+
+simu-canright-build:
+	mkdir -p $(WORK_DIR_CANRIGHT)
+	OUT_DIR=$(WORK_DIR_CANRIGHT)/hdl GATHER_CANRIGHT_SBOX=1 NUM_SHARES=$(NUM_SHARES) LATENCY=$(LATENCY) $(HDL_ROOT_DIR)/gather_sources.sh
+	cp $(TB_DIR)/* $(WORK_DIR_CANRIGHT)/hdl 
+	iverilog \
+	    -y $(WORK_DIR_CANRIGHT)/hdl \
+	    -I $(WORK_DIR_CANRIGHT)/hdl \
+	    -D TV_IN=\"${TVIN}\" \
+	    -D TV_OUT=\"${TVOUT}\" \
+	    -D CANRIGHT_SBOX \
+	    $(TB_FILE) \
+	    -o $(WORK_DIR_CANRIGHT)/simu-exec-$(TB_TARGET) \
 		-Pd=$(NUM_SHARES) \
 	    -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\" \
 		-D DEFAULTRND=1 \
