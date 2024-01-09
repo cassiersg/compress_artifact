@@ -40,6 +40,7 @@ sbox_handcrafting: $(VE_INSTALLED)
 sbox_agema:
 	make -C agema CIRCUIT=../compress/circuits/aes_bp.txt WORK=$(abspath work/aes_agema)
 	make -C agema CIRCUIT=../compress/circuits/skinny8.txt WORK=$(abspath work/skinny_agema)
+	make -C agema_direct WORK=$(abspath work/aes_agema_canright) MODULE_NAME=sbox SRC_VERILOG=$(abspath agema_direct/sbox_canright.v)
 
 skinny_sbox_serialized:
 	make -C skinny_serialized_sbox WORK=$(abspath work/skinny_serialized)
@@ -117,6 +118,9 @@ aes128postsynth:
 
 aes128fullverif: aes_sbox_opt
 	WORK=$(abspath ./work/aes128fullverif) bash -c "cd full_aes/128-bit/fullverif && ./run_fullverif.sh"
+
+aes128agema:
+	make -C agema_direct WORK=$(abspath work/aes128agema) MODULE_NAME=AES SRC_VERILOG=$(AGEMA_ROOT)/../CaseStudies/08_AES128_round_based_encryption/netlists/AES.v
 
 
 help:
