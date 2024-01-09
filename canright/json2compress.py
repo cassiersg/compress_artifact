@@ -1,6 +1,8 @@
 import argparse 
 import json
 import functools as ft
+import networkx as nx
+import re
 
 def parser_add_option(parser):
     parser.add_argument(
@@ -32,27 +34,114 @@ class Counter:
     def __str__(self):
         return "{}".format(self.value)
 
+class InOrderArchitectureBuilder:
+    OPregex="[+!&]"
+    def __init__(self):
+        self.graph = nx.DiGraph()
+        self.dependencies_map = {}
+        self.variable_id_map = {} 
+        self.statement_map = {}
+        # Resulting from a success solve
+        self.sorted_node_id = None  
+        self.inputs = None
+
+    def node_identifier(self,node_vars):
+        return ft.reduce(lambda a,b: str(a)+'_'+str(b), node_vars).replace(' ','')
+
+    # Create a node variable (may cover multiple variables) 
+    # with the appropriate dependency link.
+    def add_dependency_node(self,node_vars, dependency_vars, node_statement: str):
+        # Generate the node identifier
+        node_id = self.node_identifier(node_vars)
+        # Assign the id to each variable in the map 
+        for var_id in node_vars:
+            if var_id not in self.variable_id_map:
+                self.variable_id_map[var_id] = node_id
+            else:
+                raise ValueError("Trying to re-define an already defined variable.")
+        # Create the dependency list  
+        self.dependencies_map[node_id] = dependency_vars
+        # Add the rule for building node var
+        self.statement_map[node_id] = node_statement
+        # Clear solution
+        self.sorted_statement = None
+        self.inputs = None
+
+    # Add an architectural statement. Single operator/function statement handled.  
+    def add_statement(self, statement: str):
+        # Clean statement        
+        clean_statement = statement.replace(" ","")
+        clean_statement = statement.replace("\n","")
+        split_eq = clean_statement.split("=")
+        assert len(split_eq) == 2
+        out_var_id = re.split(',',split_eq[0].replace('(','').replace(')','').replace(' ',''))
+        # Parse input
+        if ',' in split_eq[1]:
+            # Function as operator
+            in_var_id = re.split(',',split_eq[1].split('(')[1].split(')')[0])
+        else:
+            in_var_id = re.split(InOrderArchitectureBuilder.OPregex,split_eq[1].replace(" ",""))
+        # Create the node
+        self.add_dependency_node(out_var_id, in_var_id, statement)
+
+
+    # Solve dependencies order
+    def solve(self):
+        # First, create the directed acyclic graph with variable dependcies
+        G = nx.DiGraph()
+        # Add all the intermediate variable as variables
+        G.add_nodes_from(self.dependencies_map.keys())
+        input_set_identified = []
+        no_inputs = [e for e in self.variable_id_map.keys()]
+        for vname, dvars in self.dependencies_map.items():
+            for dep_varid in dvars:
+                # If not into the variable map, then it is a global input
+                if not(dep_varid in no_inputs) and not(dep_varid in input_set_identified):
+                    input_set_identified.append(dep_varid)
+                    self.variable_id_map[dep_varid] = dep_varid
+                    G.add_node(dep_varid)
+                # Create the edge
+                G.add_edge(self.variable_id_map[dep_varid], vname)
+
+        # Solve the topological sort
+        self.sorted_node_id = nx.topological_sort(G)
+        self.input = input_set_identified
+
+    # Return a list containeing the sorted statement
+    # CAUTION: inputs not included
+    def get_sorted_statements(self):
+        ordered_statement = []
+        for s in self.sorted_node_id:
+            if s not in self.input:
+                ordered_statement.append(self.statement_map[s])
+        return ordered_statement
 
 def parse_ports(topmod, varmap, txt_out):
     # Add input/output declaration
     top_ports=topmod['ports']
     input_ports = []
     output_ports = []
+    input_bits = []
+    output_bits = []
     for pname in top_ports:
         # Get the port
         port = top_ports[pname]
         port_direction = port["direction"]
         # Keep track of port sigs to create the IO declarations
         list_port_sigs = []
+        list_port_bits = []
         # Add to map the corresponding bits
         for bi,be in enumerate(port['bits']):
             variables_map[be] = "{}{}".format(pname,bi)
             list_port_sigs += [variables_map[be]]
+            list_port_bits += [be]
         # Append to corresponding port
         if port_direction == "input":
             input_ports += list_port_sigs
+            input_bits += list_port_bits
         elif port_direction == "output":
             output_ports += list_port_sigs
+            output_bits += list_port_bits
         else:
             raise ValueError("Port direction not handled")
     # Create the INPUT/OUTPUT declaration
@@ -60,6 +149,7 @@ def parse_ports(topmod, varmap, txt_out):
     output_str_port_sigs = ft.reduce(lambda a, b: a+' '+b, output_ports)
     txt_out.append("INPUTS {}".format(input_str_port_sigs))
     txt_out.append("OUTPUTS {}".format(output_str_port_sigs))
+    return input_bits, output_bits
             
 def filter_name(name):
     to_remove = ['$','.',':']
@@ -184,7 +274,7 @@ if __name__ == "__main__":
     circuit_compress_lines = []
 
     # Process inputs/output ports
-    parse_ports(
+    input_bits, output_bits = parse_ports(
             yosys_netlist['modules'][args.top],
             variables_map,
             circuit_compress_lines
@@ -196,6 +286,16 @@ if __name__ == "__main__":
             variables_map,
             circuit_compress_lines
             )
+
+    # Create the architecture builder in order from generated lines 
+    # appart from INPUT/OUTPUTS
+    builder = InOrderArchitectureBuilder()
+    for s in circuit_compress_lines[2:]:
+        builder.add_statement(s)
+
+    # Solve order and recover statement in order
+    builder.solve()
+    circuit_compress_lines[2:] = builder.get_sorted_statements()
 
     # Dump all lines in a file    
     with open(args.compress_file, 'w') as f:

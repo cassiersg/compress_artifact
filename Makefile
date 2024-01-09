@@ -97,7 +97,7 @@ DS=2 3 4
 aes32beh: aes_sbox_opt
 	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/beh_simu WORK=$(abspath ./work/aes32beh_d$D) NUM_SHARES=$D simu; )
 
-aes32synth: aes_sbox_opt
+aes32synth: aes_sbox_opt canright_aes_sbox_opt
 	make -C full_aes/32-bit/synth WORK=$(abspath ./work/aes32synth) report
 
 aes32postsynth:
