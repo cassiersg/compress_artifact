@@ -15,8 +15,14 @@ TV_FILE_PREF=ECBKeySbox128
 #TV_FILE_PREF=ECBVarKey128
 #TV_FILE_PREF?=ECBVarTxt128
 
-WORK_DIR_BP = $(WORK)/aesbp
-WORK_DIR_CANRIGHT = $(WORK)/aescanright
+GATHER_ENV=OUT_DIR=$(WORK)/hdl NUM_SHARES=$(NUM_SHARES) LATENCY=$(LATENCY)
+IVERILOG_DEFINES=-D TV_IN=\"${TVIN}\" -D TV_OUT=\"${TVOUT}\"
+IVERILOG_DEFINES+= -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\"
+IVERILOG_DEFINES+= -D DEFAULTRND=1 -D behavioral
+ifeq ($(CANRIGHT),1)
+	GATHER_ENV+= GATHER_CANRIGHT_SBOX=1 
+	IVERILOG_DEFINES+= -D CANRIGHT_SBOX
+endif
 
 ###########################
 KATIN=${TV_DIR}/${TV_FILE_PREF}.rsp
@@ -34,44 +40,20 @@ tv: ${TVIN}
 wave:
 	gtkwave $(WORK)/log-$(TB_TARGET).vcd waves-$(TB_TARGET).gtkw
 
-simu-bp: ${TVIN} simu-bp-build
-	vvp $(WORK_DIR_BP)/simu-exec-$(TB_TARGET)
+simu: ${TVIN} simu-build
+	vvp $(WORK)/simu-exec-$(TB_TARGET)
 
-simu-bp-build:
-	mkdir -p $(WORK_DIR_BP)
-	OUT_DIR=$(WORK_DIR_BP)/hdl NUM_SHARES=$(NUM_SHARES) LATENCY=$(LATENCY) $(HDL_ROOT_DIR)/gather_sources.sh
-	cp $(TB_DIR)/* $(WORK_DIR_BP)/hdl 
+simu-build:
+	mkdir -p $(WORK)
+	$(GATHER_ENV) $(HDL_ROOT_DIR)/gather_sources.sh
+	cp $(TB_DIR)/* $(WORK)/hdl 
 	iverilog \
-	    -y $(WORK_DIR_BP)/hdl \
-	    -I $(WORK_DIR_BP)/hdl \
-	    -D TV_IN=\"${TVIN}\" \
-	    -D TV_OUT=\"${TVOUT}\" \
+	    -y $(WORK)/hdl \
+	    -I $(WORK)/hdl \
+	    $(IVERILOG_DEFINES) \
 	    $(TB_FILE) \
-	    -o $(WORK_DIR_BP)/simu-exec-$(TB_TARGET) \
-		-Pd=$(NUM_SHARES) \
-	    -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\" \
-		-D DEFAULTRND=1 \
-		-D behavioral
-
-simu-canright: ${TVIN} simu-canright-build
-	vvp $(WORK_DIR_CANRIGHT)/simu-exec-$(TB_TARGET)
-
-simu-canright-build:
-	mkdir -p $(WORK_DIR_CANRIGHT)
-	OUT_DIR=$(WORK_DIR_CANRIGHT)/hdl GATHER_CANRIGHT_SBOX=1 NUM_SHARES=$(NUM_SHARES) LATENCY=$(LATENCY) $(HDL_ROOT_DIR)/gather_sources.sh
-	cp $(TB_DIR)/* $(WORK_DIR_CANRIGHT)/hdl 
-	iverilog \
-	    -y $(WORK_DIR_CANRIGHT)/hdl \
-	    -I $(WORK_DIR_CANRIGHT)/hdl \
-	    -D TV_IN=\"${TVIN}\" \
-	    -D TV_OUT=\"${TVOUT}\" \
-	    -D CANRIGHT_SBOX \
-	    $(TB_FILE) \
-	    -o $(WORK_DIR_CANRIGHT)/simu-exec-$(TB_TARGET) \
-		-Pd=$(NUM_SHARES) \
-	    -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\" \
-		-D DEFAULTRND=1 \
-		-D behavioral
+	    -o $(WORK)/simu-exec-$(TB_TARGET) \
+		-Pd=$(NUM_SHARES)
 
 clean:
 	-rm -r $(WORK)

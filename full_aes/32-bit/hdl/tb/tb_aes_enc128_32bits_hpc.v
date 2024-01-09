@@ -8,11 +8,14 @@
 // OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE.
 // Please see the CERN-OHL-P v2 for applicable conditions.
 `timescale 1ns/1ps
+`ifndef DEFAULTSHARES
+`define DEFAULTSHARES 2
+`endif
 module tb_aes_enc128_32bits_hpc
 #
 (
     parameter T = 2,
-    parameter d = 2,
+    parameter d = `DEFAULTSHARES,
     parameter RND_RANGE_LAT_RESEED=600,
     parameter RND_RANGE_LAT_IN=100,
     parameter CONTINUOUS = 0

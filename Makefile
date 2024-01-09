@@ -95,21 +95,23 @@ silver:
 ### Full AES instances ###
 
 DS=2 3 4
-aes32beh: #aes_sbox_opt
-	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/beh_simu WORK=$(abspath ./work/aes32beh_d$D) NUM_SHARES=$D simu-bp; )
-	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/beh_simu WORK=$(abspath ./work/aes32canrightbeh_d$D) NUM_SHARES=$D simu-canright; )
+aes32beh: aes_sbox_opt canright_aes_sbox_opt
+	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/beh_simu WORK=$(abspath ./work/aes32bpbeh_d$D) NUM_SHARES=$D simu; )
+	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/beh_simu WORK=$(abspath ./work/aes32canrightbeh_d$D) NUM_SHARES=$D CANRIGHT=1 simu; )
 
 aes32synth: aes_sbox_opt canright_aes_sbox_opt
 	make -C full_aes/32-bit/synth WORK=$(abspath ./work/aes32synth) report
 
 aes32postsynth:
 	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/post_synth_simu SYNTH_WORK=$(abspath ./work/aes32synth) NUM_SHARES=$D WORK=$(abspath ./work/aes32postsynth_d$D) simu; )
+	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/post_synth_simu SYNTH_WORK=$(abspath ./work/aes32synth) NUM_SHARES=$D WORK=$(abspath ./work/aes32postsynth_d$D) CANRIGHT=1 simu; )
 
-aes32fullverif: aes_sbox_opt
-	set -e; $(foreach D,$(DS), NUM_SHARES=$D WORK=$(abspath ./work/aes32fullverif_d$D) bash -c "cd full_aes/32-bit/fullverif && ./run_fullverif.sh" ; )
+aes32fullverif: aes_sbox_opt canright_aes_sbox_opt
+	set -e; $(foreach D,$(DS), NUM_SHARES=$D WORK=$(abspath ./work/aes32bpfullverif_d$D) bash -c "set -e; cd full_aes/32-bit/fullverif && ./run_fullverif.sh" ; )
+	set -e; $(foreach D,$(DS), NUM_SHARES=$D WORK=$(abspath ./work/aes32canrightfullverif_d$D) CANRIGHT=1 bash -c "set -e; cd full_aes/32-bit/fullverif && ./run_fullverif.sh" ; )
 
 aes128beh: aes_sbox_opt canright_aes_sbox_opt
-	#set -e; $(foreach D,$(DS), make -C full_aes/128-bit/beh_simu WORK=$(abspath ./work/aes128beh_d$D) NUM_SHARES=$D simu-bp; )
+	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/beh_simu WORK=$(abspath ./work/aes128beh_d$D) NUM_SHARES=$D simu-bp; )
 	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/beh_simu WORK=$(abspath ./work/aes128canrightbeh_d$D) NUM_SHARES=$D simu-canright; )
 
 aes128synth: aes_sbox_opt
@@ -119,7 +121,7 @@ aes128postsynth:
 	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/post_synth_simu SYNTH_WORK=$(abspath ./work/aes128synth) NUM_SHARES=$D WORK=$(abspath ./work/aes128postsynth_d$D) simu; )
 
 aes128fullverif: aes_sbox_opt
-	WORK=$(abspath ./work/aes128fullverif) bash -c "cd full_aes/128-bit/fullverif && ./run_fullverif.sh"
+	WORK=$(abspath ./work/aes128fullverif) bash -c "set -e; cd full_aes/128-bit/fullverif && ./run_fullverif.sh"
 
 aes128agema:
 	make -C agema_direct WORK=$(abspath work/aes128agema) MODULE_NAME=AES SRC_VERILOG=$(AGEMA_ROOT)/../CaseStudies/08_AES128_round_based_encryption/netlists/AES.v

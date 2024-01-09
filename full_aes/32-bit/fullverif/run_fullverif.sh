@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -o pipefail
 
 ## Source settings
 HDL_ROOT_DIR=../hdl
@@ -15,6 +16,15 @@ CLOCK=clk
 # name of the instance of the main module in the testbench
 DUT=dut.aes_core
 
+NUM_SHARES=${NUM_SHARES:-2}
+export VDEFINES="-DDEFAULTSHARES=$NUM_SHARES -Dbehavioral"
+if [ "$CANRIGHT" = "1" ]; then
+    export GATHER_CANRIGHT_SBOX=1 
+    export VDEFINES="$VDEFINES -DCANRIGHT_SBOX=1"
+fi
+
+echo "Starting verification d=$NUM_SHARES."
+
 ## workdir
 HDL_DIR=$WORK/hdl
 VCD_PATH=$WORK/a.vcd
@@ -24,13 +34,13 @@ SYNTH_BASE=$WORK/${MAIN_MODULE}_synth
 # Prepare sources
 rm -rf $WORK
 mkdir -p $WORK
-NUM_SHARES=${NUM_SHARES:-2} LATENCY=4 OUT_DIR=$HDL_DIR $HDL_ROOT_DIR/gather_sources.sh
+LATENCY=4 OUT_DIR=$HDL_DIR $HDL_ROOT_DIR/gather_sources.sh
 # NB: we use the convention that module X is always in file X.v in this script
 
 
 ####### Execution #######
 echo "Starting synthesis..."
-OUT_DIR=$WORK MAIN_MODULE=$MAIN_MODULE IMPLEM_DIR=$HDL_DIR ${YOSYS:=yosys} -c ./msk_presynth.tcl || exit
+OUT_DIR=$WORK MAIN_MODULE=$MAIN_MODULE IMPLEM_DIR=$HDL_DIR ${YOSYS:=yosys} -q -c ./msk_presynth.tcl || exit -1
 echo "Synthesis finished."
 
 echo "Generating TV..."
@@ -58,6 +68,7 @@ ${IVERILOG:=iverilog} \
     -D CORE_SYNTHESIZED=1 \
     -D RUN_AM=1 \
     -D FULLVERIF=1 \
+    $VDEFINES \
     -Pd=$NUM_SHARES \
     $SYNTH_BASE.v $TB_PATH || exit
     #-y $FULLVERIF_LIB_DIR \
