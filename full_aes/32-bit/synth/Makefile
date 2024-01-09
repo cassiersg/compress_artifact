@@ -34,7 +34,7 @@ all_synth:
 	for nshares in 2 3 4 5; do make -C . NUM_SHARES=$$nshares synth_canright; done
 
 report: all_synth
-	python table_area.py --results-dir $(WORK) --outcsv $(WORK)/areas.csv --outlatex $(WORK)/areas_full_aes.tex
+	python table_area.py --results-dir $(WORK) --outcsv $(WORK)/areas.csv
 
 clean:
 	-rm -r $(WORK)
