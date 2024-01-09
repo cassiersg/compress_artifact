@@ -15,10 +15,12 @@ module MSKaes_128bits_SB
     rnd_bus0w,
     rnd_bus1w,
     rnd_bus2w
+`ifdef CANRIGHT_SBOX
+    ,rnd_bus3w
+`endif
 );
 
-//`include "MSKand_hpc2.vh"
-`include "aes_bp.vh"
+`include "design.vh"
 
 // IOs
 input clk;
@@ -30,6 +32,9 @@ output [128*d-1:0] sh_state_out;
 input [16*rnd_bus0-1:0] rnd_bus0w;
 input [16*rnd_bus1-1:0] rnd_bus1w;
 input [16*rnd_bus2-1:0] rnd_bus2w;
+`ifdef CANRIGHT_SBOX
+input [16*rnd_bus3-1:0] rnd_bus3w;
+`endif
 
 // Byte matrix representation
 wire [8*d-1:0] sh_byte_in [15:0];
@@ -61,6 +66,9 @@ for(i=0;i<16;i=i+1) begin: sbox_inst
         .rnd_bus0w(rnd_bus0w[i*rnd_bus0 +: rnd_bus0]),
         .rnd_bus1w(rnd_bus1w[i*rnd_bus1 +: rnd_bus1]),
         .rnd_bus2w(rnd_bus2w[i*rnd_bus2 +: rnd_bus2]),
+`ifdef CANRIGHT_SBOX
+        .rnd_bus3w(rnd_bus3w[i*rnd_bus3 +: rnd_bus3]),
+`endif
         .o0(sh_byte_out[i][0*d +: d]),
         .o1(sh_byte_out[i][1*d +: d]),
         .o2(sh_byte_out[i][2*d +: d]),

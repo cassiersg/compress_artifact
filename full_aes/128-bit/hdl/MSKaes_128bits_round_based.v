@@ -20,9 +20,12 @@ module MSKaes_128bits_round_based
     rnd_bus0w,
     rnd_bus1w,
     rnd_bus2w
+`ifdef CANRIGHT_SBOX
+    ,rnd_bus3w
+`endif
 );
 
-`include "aes_bp.vh"
+`include "design.vh"
 
 // IOs ports
 (* fv_type="control" *)
@@ -49,6 +52,10 @@ input [20*rnd_bus0-1:0] rnd_bus0w;
 input [20*rnd_bus1-1:0] rnd_bus1w;
 (* fv_type="random", fv_count=0, fv_rnd_count_0=20*rnd_bus2 *)
 input [20*rnd_bus2-1:0] rnd_bus2w;
+`ifdef CANRIGHT_SBOX
+(* fv_type="random", fv_count=0, fv_rnd_count_0=20*rnd_bus3 *)
+input [20*rnd_bus3-1:0] rnd_bus3w;
+`endif
 
 ///// Control pipe for the round
 wire [7:0] ctrl_RCON_in, ctrl_RCON_KS, ctrl_RCON_out;
@@ -88,6 +95,9 @@ round_logic(
     .rnd_bus0w(rnd_bus0w),
     .rnd_bus1w(rnd_bus1w),
     .rnd_bus2w(rnd_bus2w),
+`ifdef CANRIGHT_SBOX
+    .rnd_bus3w(rnd_bus3w),
+`endif
     .cleaning_on(round_cleaning_on)
 );
 

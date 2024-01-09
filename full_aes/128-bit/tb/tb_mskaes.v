@@ -12,7 +12,7 @@ localparam LATENCY = `LATENCY;
 localparam T=2.0;
 localparam Td = T/2.0;
 
-`include "aes_bp.vh"
+`include "design.vh"
 
 reg clk, nrst, valid_in;
 wire ready;
@@ -41,6 +41,9 @@ pshare(
 reg [20*rnd_bus0-1:0] rnd_bus0w;
 reg [20*rnd_bus1-1:0] rnd_bus1w;
 reg [20*rnd_bus2-1:0] rnd_bus2w;
+`ifdef CANRIGHT_SBOX
+reg [20*rnd_bus3-1:0] rnd_bus3w;
+`endif
 reg prng_start_reseed;
 wire prng_out_valid;
 
@@ -63,6 +66,9 @@ dut(
     .rnd_bus0w(rnd_bus0w),
     .rnd_bus1w(rnd_bus1w),
     .rnd_bus2w(rnd_bus2w)
+`ifdef CANRIGHT_SBOX 
+    ,.rnd_bus3w(rnd_bus3w)
+`endif
 );
 assign prng_out_valid = 1'b1;
 `else
@@ -103,6 +109,11 @@ end
 for (i=0;i<20*rnd_bus2;i=i+1) begin: rnd_b_b3
     always@(posedge clk) rnd_bus2w[i] <= $random(seed);
 end
+`ifdef CANRIGHT_SBOX
+for (i=0;i<20*rnd_bus3;i=i+1) begin: rnd_b_b4
+    always@(posedge clk) rnd_bus3w[i] <= $random(seed);
+end
+`endif
 endgenerate
 
 reg [15:0] counter_simu;

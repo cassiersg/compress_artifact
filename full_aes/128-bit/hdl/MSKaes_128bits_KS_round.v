@@ -16,9 +16,12 @@ module MSKaes_128bits_KS_round
     rnd_bus0w,
     rnd_bus1w,
     rnd_bus2w
+`ifdef CANRIGHT_SBOX
+    ,rnd_bus3w
+`endif
 );
 
-`include "aes_bp.vh"
+`include "design.vh"
 
 // IOs
 input clk;
@@ -30,6 +33,9 @@ input [8*d-1:0] sh_RCON_in;
 input [4*rnd_bus0-1:0] rnd_bus0w;
 input [4*rnd_bus1-1:0] rnd_bus1w;
 input [4*rnd_bus2-1:0] rnd_bus2w;
+`ifdef CANRIGHT_SBOX 
+input [4*rnd_bus3-1:0] rnd_bus3w;
+`endif
 
 // Byte matrix representation
 genvar i;
@@ -60,6 +66,9 @@ for(i=0;i<4;i=i+1) begin: sb_inst
         .rnd_bus0w(rnd_bus0w[i*rnd_bus0 +: rnd_bus0]),
         .rnd_bus1w(rnd_bus1w[i*rnd_bus1 +: rnd_bus1]),
         .rnd_bus2w(rnd_bus2w[i*rnd_bus2 +: rnd_bus2]),
+`ifdef CANRIGHT_SBOX
+        .rnd_bus3w(rnd_bus3w[i*rnd_bus3 +: rnd_bus3]),
+`endif
         .o0(sh_lcol_SB[i][0*d +: d]),
         .o1(sh_lcol_SB[i][1*d +: d]),
         .o2(sh_lcol_SB[i][2*d +: d]),
