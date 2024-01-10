@@ -4,9 +4,11 @@ set top $::env(TOP_MOD)
 set synth_lib ../../../compress/synthesis/stdcells.lib
 set num_shares $::env(NUM_SHARES)
 set src_dir $::env(SRC_DIR)
+set defines [list {*}$::env(VDEFINES)]
+set include $::env(VINCLUDE)
 
-verilog_defaults -add -I$src_dir
-read_verilog -DDEFAULTSHARES=$num_shares $src_dir/$top.v
+verilog_defaults -add -I$include {*}$defines 
+read_verilog $src_dir/$top.v
 hierarchy -check -libdir $src_dir -top $top
 
 

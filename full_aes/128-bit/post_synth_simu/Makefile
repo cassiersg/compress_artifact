@@ -11,6 +11,11 @@ TB_FILE=$(TB_DIR)/$(TB_TARGET).v
 DESIGN_FILE=$(WORK)/design.v
 LIBRARY_VERILOG=../../../compress/synthesis/stdcells.v
 
+IVERILOG_DEFINES= -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\" -D LATENCY=$(LATENCY) -D SHARES=$(NUM_SHARES)
+IVERILOG_DEFINES+= -D DEFAULTRND=1
+ifeq ($(CANRIGHT),1)
+endif
+
 simu: simu-build
 	vvp $(WORK)/simu-exec-$(TB_TARGET)
 	grep -q -s SUCCESS $(WORK)/res_$(NUM_SHARES).log || exit 1
