@@ -13,11 +13,11 @@ def parse_reports(reports, module):
         report_dir = report.parent
         with open(report) as f:
             l = json.load(f)
-        _, order = str(report_dir.name).rsplit("_", 1)
+        _, hpc, order = str(report_dir.name).rsplit("_", 2)
         order = int(order[1:])
         areaum2 = float(l["design"]["area"])
         area_ge = areaum2 / GE
-        with open(report_dir / f"{module}_HPC3_Pipeline_d{order}.v") as f:
+        with open(report_dir / f"{module}_{hpc}_Pipeline_d{order}.v") as f:
             verilog = f.read()
         latency = int(
             re.search(r"the circuit has (\d+) register stage", verilog).group(1)
@@ -27,7 +27,7 @@ def parse_reports(reports, module):
             AREA_RND_GE * rnd_bits
         )  # RNG bit-area copied from synthesis results
         yield {
-            "design": module,
+            "design": f'{module}_{hpc}',
             "nshares": order + 1,
             "latency": latency,
             "area_ge": area_ge,

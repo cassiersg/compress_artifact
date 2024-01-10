@@ -21,8 +21,8 @@ aes_round_hand_synth:
 
 aeshpc_synth:
 	mkdir -p $(AESHPC128_WORK_DIR)
-	NUM_SHARES=$(NUM_SHARES) OUT_DIR=$(AESHPC128_WORK_DIR) LATENCY=$(LATENCY) $(AESHPC128_HDL_ROOT_DIR)/gather_sources.sh $(AESHPC128_HDL_ROOT_DIR) $(GADGETS_SRC)
-	VINCLUDE=$(AESHPC128_HDL_ROOT_DIR) VDEFINES="-DDEFAULTSHARES=$(NUM_SHARES)" WORK=$(WORK) SYNTH_NAME=aeshpc-d$(NUM_SHARES)-L$(LATENCY) LATENCY=$(LATENCY) SRC_DIR=$(AESHPC128_WORK_DIR) NUM_SHARES=$(NUM_SHARES) TOP_MOD=wrapper_aes128 yosys -c synth.tcl -l $(AESHPC128_WORK_DIR)/synth.log
+	NUM_SHARES=$(NUM_SHARES) OUT_DIR=$(AESHPC128_WORK_DIR) LATENCY=6 $(AESHPC128_HDL_ROOT_DIR)/gather_sources.sh $(AESHPC128_HDL_ROOT_DIR) $(GADGETS_SRC)
+	VINCLUDE=$(AESHPC128_HDL_ROOT_DIR) VDEFINES="-DDEFAULTSHARES=$(NUM_SHARES)" WORK=$(WORK) SYNTH_NAME=aeshpc-d$(NUM_SHARES)-L6 LATENCY=6 SRC_DIR=$(AESHPC128_WORK_DIR) NUM_SHARES=$(NUM_SHARES) TOP_MOD=wrapper_aes128 yosys -c synth.tcl -l $(AESHPC128_WORK_DIR)/synth.log
 
 synth_canright:
 	mkdir -p $(WORK_CANRIGHT)
@@ -45,9 +45,8 @@ all_synth:
 report: all_synth
 	python table_area.py --results-dir $(WORK) --outcsv $(WORK)/areas.csv
 
-
 clean:
-	-rm -r $(WORK) 
+	-rm -r $(WORK)
 
 
 .PHONY: clean synth all_synth report
