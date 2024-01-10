@@ -16,7 +16,7 @@ CLOCK=clk
 # name of the instance of the main module in the testbench
 DUT=dut.aes_core
 
-NUM_SHARES=${NUM_SHARES:-2}
+export NUM_SHARES=${NUM_SHARES:-2}
 export VDEFINES="-DDEFAULTSHARES=$NUM_SHARES -Dbehavioral"
 if [ "$CANRIGHT" = "1" ]; then
     export GATHER_CANRIGHT_SBOX=1 
@@ -80,3 +80,4 @@ echo "Starting fullverif..."
 FV_CMDLINE="${FULLVERIF:=fullverif} --json $SYNTH_BASE.json --vcd $VCD_PATH --tb $TB_MODULE --gname $MAIN_MODULE --in-valid $IN_VALID --clock $CLOCK --dut $DUT"
 echo "$FV_CMDLINE"
 $FV_CMDLINE | tee $WORK/fullverif.log
+grep -q -s "Fullverif: finished successfully." $WORK/fullverif.log || exit 1

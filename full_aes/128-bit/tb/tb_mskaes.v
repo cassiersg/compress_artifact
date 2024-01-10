@@ -1,12 +1,18 @@
 `timescale 1ns/1ps
+`ifndef DEFAULTSHARES
+`define DEFAULTSHARES 2
+`endif
 module tb_mskaes 
+#
+(
+    parameter d = `DEFAULTSHARES
+)
 ();
 
-`ifndef SHARES
-`define SHARES 2
-`endif
+`ifndef LATENCY
+`define LATENCY 4
+`endif 
 
-localparam d = `SHARES;
 localparam LATENCY = `LATENCY;
 
 localparam T=2.0;
@@ -53,7 +59,9 @@ always@(*) #Td clk<=~clk;
 // Dut
 `ifdef behavioral
 MSKaes_128bits_round_based 
+`ifndef FULLVERIF
 #(.d(d),.LATENCY(LATENCY))
+`endif
 dut(
     .nrst(nrst),
     .clk(clk),

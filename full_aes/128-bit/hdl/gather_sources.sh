@@ -11,6 +11,11 @@ then
     echo "OUT_DIR must be set"
     exit
 fi
+if [ -z "$LATENCY" ]
+then
+    echo "LATENCY must be set"
+    exit
+fi
 
 
 mkdir -p $OUT_DIR
