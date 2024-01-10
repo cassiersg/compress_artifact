@@ -121,7 +121,8 @@ aes128postsynth:
 	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/post_synth_simu SYNTH_WORK=$(abspath ./work/aes128synth) NUM_SHARES=$D WORK=$(abspath ./work/aes128postsynth_d$D) simu; )
 
 aes128fullverif: aes_sbox_opt
-	WORK=$(abspath ./work/aes128fullverif) bash -c "set -e; cd full_aes/128-bit/fullverif && ./run_fullverif.sh"
+	set -e; $(foreach D,$(DS), NUM_SHARES=$D WORK=$(abspath ./work/aes128bpfullverif_d$D) bash -c "set -e; cd full_aes/128-bit/fullverif && ./run_fullverif.sh" ; )
+	set -e; $(foreach D,$(DS), NUM_SHARES=$D WORK=$(abspath ./work/aes128canrightfullverif_d$D) CANRIGHT=1 bash -c "set -e; cd full_aes/128-bit/fullverif && ./run_fullverif.sh" ; )
 
 aes128agema:
 	make -C agema_direct WORK=$(abspath work/aes128agema) MODULE_NAME=AES SRC_VERILOG=$(AGEMA_ROOT)/../CaseStudies/08_AES128_round_based_encryption/netlists/AES.v

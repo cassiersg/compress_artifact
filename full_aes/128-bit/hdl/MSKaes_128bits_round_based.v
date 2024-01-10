@@ -1,9 +1,15 @@
+`ifndef DEFAULTSHARES
+`define DEFAULTSHARES 2
+`endif
+`ifndef DEFAULTLATENCY
+`define DEFAULTLATENCY 4
+`endif
 (* fv_prop = "PINI", fv_strat = "composite", fv_order=d *)
 module MSKaes_128bits_round_based
 #
 (
-    parameter d=2,
-    parameter LATENCY = 4
+    parameter d=`DEFAULTSHARES,
+    parameter LATENCY = `DEFAULTLATENCY
 )
 (
     // Global

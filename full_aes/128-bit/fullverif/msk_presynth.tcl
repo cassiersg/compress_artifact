@@ -2,11 +2,12 @@
 set IMPLEM_DIR $::env(IMPLEM_DIR)
 set MAIN_MODULE $::env(MAIN_MODULE)
 set OUT_DIR $::env(OUT_DIR)
+set defines [list {*}$::env(VDEFINES)]
 
 set MAIN_PATH $IMPLEM_DIR/$MAIN_MODULE.v
 
 # Read verilog, load sub-modules and build the hierarchy.
-yosys verilog_defaults -add -I$IMPLEM_DIR -DFULLVERIF
+yosys verilog_defaults -add -I$IMPLEM_DIR -DFULLVERIF {*}$defines 
 yosys read_verilog $MAIN_PATH
 yosys hierarchy -check -libdir $IMPLEM_DIR -top $MAIN_MODULE;
 
