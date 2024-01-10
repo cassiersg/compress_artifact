@@ -137,7 +137,7 @@ initial begin
     $fwrite(f,"...progress...");
 
     // Dumping 
-    $dumpfile(`VCD_PATH);
+    $dumpfile(`DUMPFILE);
     $dumpvars(0,tb_mskaes);
 
     // Init

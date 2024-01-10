@@ -8,54 +8,33 @@ TB_TARGET?=tb_mskaes
 TB_DIR=../tb
 TB_FILE=$(TB_DIR)/$(TB_TARGET).v
 
+GATHER_ENV=OUT_DIR=$(WORK)/hdl NUM_SHARES=$(NUM_SHARES) LATENCY=$(LATENCY)
+IVERILOG_DEFINES= -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\" -D LATENCY=$(LATENCY) -D SHARES=$(NUM_SHARES)
+IVERILOG_DEFINES+= -D DEFAULTRND=1 -D behavioral
+ifeq ($(CANRIGHT),1)
+	GATHER_ENV+= GATHER_CANRIGHT_SBOX=1 
+	IVERILOG_DEFINES+= -D CANRIGHT_SBOX
+endif
 
-simu-bp: simu-bp-build
+simu: ${TVIN} simu-build
 	vvp $(WORK)/simu-exec-$(TB_TARGET)
-	grep -q -s SUCCESS $(WORK)/res_$(NUM_SHARES).log || exit 1
+
+simu-build:
+	mkdir -p $(WORK)
+	$(GATHER_ENV) $(HDL_ROOT_DIR)/gather_sources.sh
+	cp $(TB_DIR)/* $(WORK)/hdl 
+	iverilog \
+	    -y $(WORK)/hdl \
+	    -I $(WORK)/hdl \
+	    $(IVERILOG_DEFINES) \
+	    $(TB_FILE) \
+	    -o $(WORK)/simu-exec-$(TB_TARGET) \
+		-Pd=$(NUM_SHARES)
+
+clean:
+	-rm -r $(WORK)
 
 wave: log.vcd wave.gtkw
 	gtkwave $(WORK)/log-$(TB_TARGET).vcd waves-$(TB_TARGET).gtkw
-
-simu-bp-build:
-	mkdir -p $(WORK) 
-	NUM_SHARES=$(NUM_SHARES) LATENCY=$(LATENCY) OUT_DIR=$(WORK)/hdl $(HDL_ROOT_DIR)/gather_sources.sh
-	cp $(TB_DIR)/* $(WORK)/hdl
-	iverilog \
-	    -y $(WORK)/hdl \
-	    -I $(WORK)/hdl \
-	    -D VCD_PATH=\"$(WORK)/log-$(TB_TARGET).vcd\" \
-	    -D RES_FILE=\"$(WORK)/res_$(NUM_SHARES).log\" \
-	    -D behavioral \
-	    $(TB_FILE) \
-	    -o $(WORK)/simu-exec-$(TB_TARGET) \
-		-Pd=$(NUM_SHARES) \
-	    -D DEFAULTRND=1 \
-	    -D SHARES=$(NUM_SHARES) \
-	    -D LATENCY=$(LATENCY)
-
-simu-canright: simu-canright-build
-	vvp $(WORK)/simu-exec-$(TB_TARGET)
-	grep -q -s SUCCESS $(WORK)/res_$(NUM_SHARES).log || exit 1
-
-simu-canright-build:
-	mkdir -p $(WORK) 
-	NUM_SHARES=$(NUM_SHARES) LATENCY=$(LATENCY) OUT_DIR=$(WORK)/hdl GATHER_CANRIGHT_SBOX=1 $(HDL_ROOT_DIR)/gather_sources.sh
-	cp $(TB_DIR)/* $(WORK)/hdl
-	iverilog \
-	    -y $(WORK)/hdl \
-	    -I $(WORK)/hdl \
-	    -D VCD_PATH=\"$(WORK)/log-$(TB_TARGET).vcd\" \
-	    -D RES_FILE=\"$(WORK)/res_$(NUM_SHARES).log\" \
-	    -D behavioral \
-	    -D CANRIGHT_SBOX \
-	    $(TB_FILE) \
-	    -o $(WORK)/simu-exec-$(TB_TARGET) \
-		-Pd=$(NUM_SHARES) \
-	    -D DEFAULTRND=1 \
-	    -D SHARES=$(NUM_SHARES) \
-	    -D LATENCY=$(LATENCY)
-
-clean:
-	-rm -r $(WORK) 
 
 .PHONY: simu wave simu-build clean

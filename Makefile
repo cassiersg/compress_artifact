@@ -111,8 +111,8 @@ aes32fullverif: aes_sbox_opt canright_aes_sbox_opt
 	set -e; $(foreach D,$(DS), NUM_SHARES=$D WORK=$(abspath ./work/aes32canrightfullverif_d$D) CANRIGHT=1 bash -c "set -e; cd full_aes/32-bit/fullverif && ./run_fullverif.sh" ; )
 
 aes128beh: aes_sbox_opt canright_aes_sbox_opt
-	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/beh_simu WORK=$(abspath ./work/aes128beh_d$D) NUM_SHARES=$D simu-bp; )
-	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/beh_simu WORK=$(abspath ./work/aes128canrightbeh_d$D) NUM_SHARES=$D simu-canright; )
+	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/beh_simu WORK=$(abspath ./work/aes128beh_d$D) NUM_SHARES=$D simu; )
+	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/beh_simu WORK=$(abspath ./work/aes128canrightbeh_d$D) NUM_SHARES=$D CANRIGHT=1 simu; )
 
 aes128synth: aes_sbox_opt
 	make -C full_aes/128-bit/synth WORK=$(abspath ./work/aes128synth) report
