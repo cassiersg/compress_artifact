@@ -9,7 +9,6 @@ import csv
 
 GE_area = 0.798
 
-
 def parse_report(fname):
     with open(fname, 'r') as f:
         j = json.load(f)
@@ -26,7 +25,7 @@ def get_results_data(results_dir):
         shares = int(r.group(2))
         lat = int(r.group(3))
         res.append((design, shares, lat, area))
-    return res 
+    return res
 
 def sblat2aeslat(lat):
     return 10*(lat+1)+1
