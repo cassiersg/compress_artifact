@@ -18,7 +18,6 @@ localparam LATENCY = `LATENCY;
 localparam T=2.0;
 localparam Td = T/2.0;
 
-`include "design.vh"
 
 reg clk, nrst, valid_in;
 wire ready;
@@ -44,12 +43,6 @@ pshare(
     .out(sh_plaintext)
 );
 
-reg [20*rnd_bus0-1:0] rnd_bus0w;
-reg [20*rnd_bus1-1:0] rnd_bus1w;
-reg [20*rnd_bus2-1:0] rnd_bus2w;
-`ifdef CANRIGHT_SBOX
-reg [20*rnd_bus3-1:0] rnd_bus3w;
-`endif
 reg prng_start_reseed;
 wire prng_out_valid;
 
@@ -58,6 +51,14 @@ always@(*) #Td clk<=~clk;
 
 // Dut
 `ifdef behavioral
+`include "design.vh"
+reg [20*rnd_bus0-1:0] rnd_bus0w;
+reg [20*rnd_bus1-1:0] rnd_bus1w;
+reg [20*rnd_bus2-1:0] rnd_bus2w;
+`ifdef CANRIGHT_SBOX
+reg [20*rnd_bus3-1:0] rnd_bus3w;
+`endif
+
 MSKaes_128bits_round_based 
 `ifndef FULLVERIF
 #(.d(d),.LATENCY(LATENCY))
@@ -105,6 +106,7 @@ for(i=0;i<128;i=i+1) begin: bit_c
 end
 endgenerate
 
+`ifdef behavioral
 // Randomness
 integer seed = 0;
 generate 
@@ -123,6 +125,7 @@ for (i=0;i<20*rnd_bus3;i=i+1) begin: rnd_b_b4
 end
 `endif
 endgenerate
+`endif
 
 reg [15:0] counter_simu;
 always@(posedge clk)
@@ -154,9 +157,16 @@ initial begin
     valid_in = 0;
     umsk_plaintext = 128'h340737e0a29831318d305a88a8f64332;
     umsk_key = 128'h3c4fcf098815f7aba6d2ae2816157e2b;
+
+    `ifdef behavioral
     rnd_bus0w = 0;
     rnd_bus1w = 0;
     rnd_bus2w = 0;
+    `ifdef CANRIGHT_SBOX
+    rnd_bus3w = 0;
+    `endif
+    `endif
+
     prng_start_reseed = 0;
     $display("Ciruit initialized (%d shares).",d);
 
