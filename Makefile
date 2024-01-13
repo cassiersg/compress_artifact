@@ -43,7 +43,7 @@ sbox_agema:
 	make -C agema_direct WORK=$(abspath work/aes_agema_canright) MODULE_NAME=sbox SRC_VERILOG=$(abspath agema_direct/sbox_canright.v)
 
 skinny_sbox_serialized:
-	make -C skinny_serialized_sbox WORK=$(abspath work/skinny_serialized)
+	make -C skinny_serialized_sbox WORK=$(abspath work/skinny_serialized) DS="2 3 4 5"
 
 # canright compress
 canright_aes_sbox_opt: $(VE_INSTALLED)

@@ -1,7 +1,7 @@
 
 WORK ?= ./work
 
-DS ?= 2 3 4
+DS ?= 2 3 4 5
 
 SYNTH_SCRIPT=synth.tcl
 AREA_REPORT = $(WORK)/areas.csv
