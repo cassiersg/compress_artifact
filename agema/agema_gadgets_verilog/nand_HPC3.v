@@ -8,10 +8,11 @@ input wire [2*half_rnd-1:0] r;
 input wire clk;
 output wire [security_order:0] c;
 
-wire [security_order:0] na;
-assign na[0] = ~a[0];
-assign na[security_order:1] = a[security_order:1];
+wire [security_order:0] nc;
 
-and_HPC3 #(security_order, pipeline) and_inner(na, b, r, clk, c);
+and_HPC3 #(security_order, pipeline) and_inner(a, b, r, clk, nc);
+
+assign c[0] = ~nc[0];
+assign c[security_order:1] = nc[security_order:1];
 
 endmodule
