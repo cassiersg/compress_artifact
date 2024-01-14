@@ -28,7 +28,7 @@ def get_results_data(results_dir):
     return res
 
 def sblat2aeslat(lat):
-    return 10*(lat+1)+1
+    return 10*(lat+1)
 
 
 def write_csv(csvfile,results_data):
