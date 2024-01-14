@@ -50,7 +50,7 @@ ALL_AREAS=$(foreach H,$(HPCS),$(foreach D,$(DS),$(call area_json,$D,$H)))
 
 $(SRC_VERILOG): $(CIRCUIT)
 	mkdir -p $(dir $@)
-	python3 circ2v.py --circuit $< --out $@
+	python3 ../compress/scripts/circ2v.py --circuit $< --out $@
 
 $(AREA_REPORT): $(ALL_AREAS) | summarize_areas.py
 	python3 summarize_areas.py --module $(MODULE_NAME) --outcsv=$@ $^
