@@ -20,8 +20,8 @@ $(YOSYS_NETLIST): $(FILE_IN) build-json-yosys.tcl
 	mkdir -p $(WORK)
 	FILE_IN=$(FILE_IN) YOSYS_NETLIST=$(YOSYS_NETLIST) yosys -c build-json-yosys.tcl
 
-$(CIRCUIT): $(YOSYS_NETLIST) json2compress.py
-	python json2compress.py \
+$(CIRCUIT): $(YOSYS_NETLIST)
+	python ../compress/scripts/yosys2compress.py \
 	    --netlist-file $(YOSYS_NETLIST) \
 	    --top Sbox \
 	    --compress-file $(CIRCUIT)
