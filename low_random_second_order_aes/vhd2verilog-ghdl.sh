@@ -1,0 +1,11 @@
+#! /bin/bash
+
+VHD_FILE=$1
+ENTITY=$2
+VERILOG_OUT_FILE=$3
+
+VHD_FILE_NOPREF="${VHD_FILE%.*}"
+VERILOG_FILE_NOPREF="${VERILOG_OUT_FILE%.*}"
+
+ghdl -a $VHD_FILE
+ghdl synth --out=verilog $ENTITY > $VERILOG_OUT_FILE
