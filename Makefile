@@ -129,5 +129,9 @@ aes128agema:
 	make -C agema_direct WORK=$(abspath work/aes128agema) MODULE_NAME=AES SRC_VERILOG=$(AGEMA_ROOT)/../CaseStudies/08_AES128_round_based_encryption/netlists/AES.v
 
 
+### Masked AES Sbox with TI
+lr_2OM_aes_sbox:
+	make -C low_random_second_order_aes WORK=$(abspath work/low_random_second_order_aes) area 
+
 help:
 	@echo "See REDAME.md."
