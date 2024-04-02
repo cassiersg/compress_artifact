@@ -138,6 +138,7 @@ dom_aes_sbox:
 	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=2 make -C dom-sbox area 
 	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=3 make -C dom-sbox area 
 	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=4 make -C dom-sbox area 
+	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=5 make -C dom-sbox area 
 	
 
 help:
