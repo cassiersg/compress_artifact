@@ -15,7 +15,6 @@ SYNTH_TOP=$(MODULE_NAME)
 SYNTH_LIB ?=../compress/synthesis/stdcells.lib
 RESDIR=$(CASE_DIR)/area
 
-
 $(RESDIR): 
 	if [ -d $(RESDIR) ]; then echo "$(RESDIR) already exists"; else mkdir -p $(RESDIR); fi
 

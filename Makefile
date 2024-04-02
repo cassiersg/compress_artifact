@@ -133,5 +133,12 @@ aes128agema:
 lr_2OM_aes_sbox:
 	make -C low_random_second_order_aes WORK=$(abspath work/low_random_second_order_aes) area 
 
+### DOM AES Sbox
+dom_aes_sbox:
+	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=2 make -C dom-sbox area 
+	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=3 make -C dom-sbox area 
+	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=4 make -C dom-sbox area 
+	
+
 help:
 	@echo "See REDAME.md."
