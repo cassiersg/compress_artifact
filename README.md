@@ -21,6 +21,7 @@ Some part of the artifact additionally require:
 - [AGEMA](https://github.com/Chair-for-Security-Engineering/AGEMA) (commit `4e43d9d61` tested)
 - [fullverif](https://github.com/cassiersg/fullverif) (commit `227f31215` tested)
 - [SILVER](https://github.com/Chair-for-Security-Engineering/SILVER) (commit `57fd89b71` tested)
+- [GHDL](https://github.com/ghdl/ghdl) (version 4.1.0 tested)
 
 ## Contents
 
