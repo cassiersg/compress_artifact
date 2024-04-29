@@ -88,19 +88,19 @@ Additionally, the synthesis results for the AES Sbox with DOM are obtained with
 ```
 make dom_aes_sbox
 ```
-and the Yosys area report is generated in `work/DOM_aes_sbox/d{2,3,4,5}/area/area.json`.
+and the (Yosys) area report is generated in `work/DOM_aes_sbox/d{2,3,4,5}/area/area.json`.
 
 For the AES Sbox from [DSM22], the area synthesis results are obtained with 
 ```
 make lr_2OM_aes_sbox
 ```
-and the Yosys area report is generated in `work/low_random_second_order_aes/area/area.json`.
+and the (Yosys) area report is generated in `work/low_random_second_order_aes/area/area.json`.
 
 Finally, the Skinny Sbox synthesis results from [CCGB21] are obtained via
 ```
 make skinny_ti
 ```
-and the Yosys area report is generated in `work/skinny_ti/skinny-hdl-thresh-{222,2222,232,33}/area.json`.
+and the (Yosys) area report is generated in `work/skinny_ti/skinny-hdl-thresh-{222,2222,232,33}/area.json`.
 
 ### Adders
 
