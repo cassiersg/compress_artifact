@@ -2,6 +2,7 @@
 WORK ?= work
 DS=1 2 3 4
 
+SYNTH_LIB ?= ../compress/synthesis/stdcells.lib
 MODULE_NAME?=sbox
 SRC_VERILOG?=$(AGEMA_ROOT)/../CaseStudies/04_AES_Sbox_Canright/netlists/sbox.v
 AREA_REPORT = $(WORK)/$(MODULE_NAME)_area.csv
@@ -37,7 +38,7 @@ $(call area_json,$(1),$(2)): $(call synth_verilog,$(1),$(2))
 	RESDIR=$(call synth_dir,$(1),$(2)) \
 		SYNTH_TOP=$(call synth_module,$(1),$(2)) \
 		SYNTH_SRCS="$(call synth_verilog,$(1),$(2)) `find agema_gadgets_verilog/ -iname '*.v'`" \
-		SYNTH_LIB=stdcells.lib \
+		SYNTH_LIB=$(SYNTH_LIB) \
 		VDEFINES= \
 		VINCLUDE=agema_gadgets_verilog \
 		yosys -q -c synth.tcl

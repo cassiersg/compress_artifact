@@ -1,6 +1,7 @@
 
 WORK ?= work
 CIRCUIT ?=../compress/circuits/aes_bp.txt
+SYNTH_LIB ?= ../compress/synthesis/stdcells.lib
 DS=1 2 3 4
 
 MODULE_NAME=$(basename $(notdir $(CIRCUIT)))
@@ -38,7 +39,7 @@ $(call area_json,$(1),$(2)): $(call synth_verilog,$(1),$(2))
 	RESDIR=$(call synth_dir,$(1),$(2)) \
 		SYNTH_TOP=$(call synth_module,$(1),$(2)) \
 		SYNTH_SRCS="$(call synth_verilog,$(1),$(2)) `find agema_gadgets_verilog/ -iname '*.v'`" \
-		SYNTH_LIB=stdcells.lib \
+		SYNTH_LIB=$(SYNTH_LIB) \
 		VDEFINES= \
 		VINCLUDE=agema_gadgets_verilog \
 		yosys -q -c synth.tcl
