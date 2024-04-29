@@ -1,8 +1,11 @@
 # COMPRESS artifact
 
-This repository contains the artifact for the paper
-[**Compress: Reducing Area and Latency of Masked Pipelined Circuits**](https://eprint.iacr.org/2023/1600).
-The artifact contains all the code on which the results presented in the paper are based, except for COMPRESS itself, which is in a [separate repository](https://github.com/cassiersg/compress) (and is included as a submodule of this repository).
+This repository contains the artifact for the paper [**Compress: Reducing Area
+and Latency of Masked Pipelined Circuits**](https://eprint.iacr.org/2023/1600).
+The artifact contains all the code on which the results presented in the paper
+are based, except for COMPRESS itself, which is in a [separate
+repository](https://github.com/cassiersg/compress) (and is included as a
+submodule of this repository).
 
 ## Getting started
 
@@ -31,13 +34,16 @@ Some part of the artifact additionally require:
 ├── agema_direct # Masked circuit generation and synthesis of AGEMA example circuits.
 ├── canright # Masking of Canright AES Sbox with COMPRESS.
 ├── compress # Submodule containing COMPRESS and misc. gadgets.
+├── dom-sbox # Masking of Canright AES Sbox with DOM [GMK16]. 
 ├── full_aes
 │   ├── 128-bit # round-based AES
 │   └── 32-bit # AES with 32-bit serial architecture
 ├── gadget_verif # Verification of COMPRESS gadgets with SILVER.
+├── low_random_second_order_aes # AES Sbox of [DSM22]
 ├── Makefile # Top-level makefile for running all flows of this repository.
 ├── skinny_serialized_sbox # Skinny Sbox of [VCS22].
-└── work # Where all temporary and result files go.
+├── skinny_ti # Skinny Sbox of [CCGB21].
+└── work # Where all temporary and result files are generated.
 ```
 
 ## Usage
