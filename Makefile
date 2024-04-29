@@ -145,6 +145,6 @@ aes128agema:
 	
 
 help:
-	@echo "See REDAME.md."
+	@echo "See README.md."
 
 .PHONY: skinny_ti

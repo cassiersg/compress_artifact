@@ -71,18 +71,36 @@ make aes_sbox_compress
 make canright_aes_sbox_opt
 make skinny_sbox_compress
 make sbox_handcrafting
-make sbox_agema
+make sbox_agema # Requires $AGEMA_ROOT to be set
 ```
 The reports for area usage and design generation execution time are in 
 `work/{aes,skinny}_{opt,sep,base}/{aes_bp,skinny8}_area.csv` for COMPRESS,
 `work/handcrafting/{aes_bp,skinny8}_area.csv` for handcrafting, and
 `work/agema_{skinny,aes}/{aes_bp,skinny8}_areas.csv` for AGEMA.
 
-Finally, we synthesize the serialized Skinny8 S-box of [VCS22] with
+Besides, we synthesize the serialized Skinny8 S-box of [VCS22] with
 ```
 make skinny_sbox_serialized
 ```
 Area report is generated in `work/skinny_serialized/areas.csv`.
+
+Additionally, the synthesis results for the AES Sbox with DOM are obtained with
+```
+make dom_aes_sbox
+```
+and the Yosys area report is generated in `work/DOM_aes_sbox/d{2,3,4,5}/area/area.json`.
+
+For the AES Sbox from [DSM22], the area synthesis results are obtained with 
+```
+make lr_2OM_aes_sbox
+```
+and the Yosys area report is generated in `work/low_random_second_order_aes/area/area.json`.
+
+Finally, the Skinny Sbox synthesis results from [CCGB21] are obtained via
+```
+make skinny_ti
+```
+and the Yosys area report is generated in `work/skinny_ti/skinny-hdl-thresh-{222,2222,232,33}/area.json`.
 
 ### Adders
 
