@@ -111,8 +111,8 @@ make adders_compress
 make adders_handcrafting
 make adders_agema
 ```
-Area reports are generated respectively in work/adders/*.csv`,
-work/adders_handcrafting/*.csv` and work/adders_agema/*.csv`.
+Area reports are generated respectively in `work/adders/*.csv`,
+`work/adders_handcrafting/*.csv` and `work/adders_agema/*.csv`.
 
 ### COMPRESS gadget verification
 
