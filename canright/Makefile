@@ -15,7 +15,7 @@ all: $(AREA_REPORT)
 clean:
 	-rm -r $(WORK) / 2> /dev/null
 
-FILE_IN=canright_aes_sbox_trivial_from_c.v
+FILE_IN=canright_aes_sbox.v
 $(YOSYS_NETLIST): $(FILE_IN) build-json-yosys.tcl 
 	mkdir -p $(WORK)
 	FILE_IN=$(FILE_IN) YOSYS_NETLIST=$(YOSYS_NETLIST) yosys -c build-json-yosys.tcl

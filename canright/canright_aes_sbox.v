@@ -1,5 +1,4 @@
-// Straight translation of Canright's S-box in C (Appendix A) to verilog.
-// Canright, David. A very compact Rijndael S-box. Monterey, California. Naval Postgraduate School, 2004.
+// Straight translation of Canright's S-box in verilog.
 
 // multiplication in GF(2^2) using normal basis (Omega^2, Omega)
 module G4_mul(input wire [1:0] x, input wire [1:0] y, output wire [1:0] z);
