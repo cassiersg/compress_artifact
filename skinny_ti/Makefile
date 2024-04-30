@@ -1,7 +1,7 @@
 
 WORK ?= work
 
-SYNTH_LIB ?=../compress/synthesis/stdcells.lib
+SYNTH_LIB ?=../compress/synthesis/nangate45-pdk/stdcells.lib
 
 IMPLEMS=$(addprefix skinny-hdl-thresh-,2222 222 232 33)
 WIMPLEMS=$(addprefix $(WORK)/,$(IMPLEMS))

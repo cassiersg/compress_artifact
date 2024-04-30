@@ -8,7 +8,7 @@ AREA_REPORT = $(WORK)/areas.csv
 
 SYNTH_SRCS=../compress/gadget_library/BIN/*.v ../compress/gadget_library/MSK/*.v
 export VINCLUDE=../compress/gadget_library/MSK
-export SYNTH_LIB=../compress/synthesis/stdcells.lib
+export SYNTH_LIB=../compress/synthesis/nangate45-pdk/stdcells.lib
 
 define area
 $(WORK)/d_$(1)/area.json

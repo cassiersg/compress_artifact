@@ -2,7 +2,7 @@
 WORK ?= work
 DS=1 2 3 4
 
-SYNTH_LIB ?= ../compress/synthesis/stdcells.lib
+SYNTH_LIB ?= ../compress/synthesis/nangate45-pdk/stdcells.lib
 MODULE_NAME?=sbox
 SRC_VERILOG?=$(AGEMA_ROOT)/../CaseStudies/04_AES_Sbox_Canright/netlists/sbox.v
 AREA_REPORT = $(WORK)/$(MODULE_NAME)_area.csv

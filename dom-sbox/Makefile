@@ -12,7 +12,7 @@ SYNTH_SRCS = $(shell ls $(HDL_DIR)/*.v)
 VDEFINES=""
 VINCLUDE="$(HDL_DIR)"
 SYNTH_TOP=$(MODULE_NAME)
-SYNTH_LIB ?=../compress/synthesis/stdcells.lib
+SYNTH_LIB ?=../compress/synthesis/nangate45-pdk/stdcells.lib
 RESDIR=$(CASE_DIR)/area
 
 $(RESDIR): 

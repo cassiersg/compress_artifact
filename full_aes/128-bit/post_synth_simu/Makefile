@@ -10,7 +10,7 @@ TB_DIR=../tb
 TB_FILE=$(TB_DIR)/$(TB_TARGET).v
 
 DESIGN_FILE=$(WORK)/design.v
-LIBRARY_VERILOG=../../../compress/synthesis/stdcells.v
+LIBRARY_VERILOG=../../../compress/synthesis/nangate45-pdk/stdcells.v
 
 IVERILOG_DEFINES=-D DEFAULTSHARES=$(NUM_SHARES) -D DUMPFILE=\"$(WORK)/log-$(TB_TARGET).vcd\" -D LATENCY=$(LATENCY)
 IVERILOG_DEFINES+= -D DEFAULTRND=1

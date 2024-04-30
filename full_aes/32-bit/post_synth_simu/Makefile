@@ -17,7 +17,7 @@ TV_FILE_PREF=ECBGFSbox128
 #TV_FILE_PREF?=ECBVarTxt128
 
 DESIGN_FILE=$(WORK)/design.v
-LIBRARY_VERILOG=../../../compress/synthesis/stdcells.v
+LIBRARY_VERILOG=../../../compress/synthesis/nangate45-pdk/stdcells.v
 
 
 IVERILOG_DEFINES=-D TV_IN=\"${TVIN}\" -D TV_OUT=\"${TVOUT}\"

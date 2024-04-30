@@ -1,7 +1,7 @@
 
 WORK ?= work
 CIRCUIT ?=../compress/circuits/aes_bp.txt
-SYNTH_LIB ?= ../compress/synthesis/stdcells.lib
+SYNTH_LIB ?= ../compress/synthesis/nangate45-pdk/stdcells.lib
 DS=1 2 3 4
 
 MODULE_NAME=$(basename $(notdir $(CIRCUIT)))

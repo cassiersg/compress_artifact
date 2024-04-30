@@ -1,7 +1,7 @@
 yosys -import
 
 set top $::env(TOP_MOD)
-set synth_lib ../../../compress/synthesis/stdcells.lib
+set synth_lib ../../../compress/synthesis/nangate45-pdk/stdcells.lib
 set num_shares $::env(NUM_SHARES)
 set src_dir $::env(SRC_DIR)
 set defines [list {*}$::env(VDEFINES)]

@@ -6,7 +6,7 @@ SYNTH_SRCS=$(shell ls ./*.v)
 VDEFINES=""
 VINCLUDE="."
 SYNTH_TOP=$(MODULE_NAME)
-SYNTH_LIB ?= ../compress/synthesis/stdcells.lib
+SYNTH_LIB ?= ../compress/synthesis/nangate45-pdk/stdcells.lib
 RESDIR=$(WORK)/area
 
 $(RESDIR): 
