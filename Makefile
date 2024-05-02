@@ -4,6 +4,14 @@ VE=$(abspath ./work/ve)
 VE_INSTALLED=$(VE)/installed
 PYTHON_VE=source $(VE)/bin/activate
 
+SKIP_BEH_SIMU ?= 1
+SKIP_STRUCT_SIMU ?= 1
+TIMEOUT_COMPRESS ?= 3600
+
+export TIMEOUT_COMPRESS
+export SKIP_BEH_SIMU
+export SKIP_STRUCT_SIMU
+
 all: help
 
 
