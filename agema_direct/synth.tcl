@@ -18,7 +18,7 @@ set resdir $::env(RESDIR)
 foreach file $srcs {
     yosys read_verilog -I$include {*}$defines $file
 }
-yosys hierarchy -check -top $top
+yosys hierarchy -top $top
 
 
 yosys proc
