@@ -23,7 +23,7 @@ The scripts in the repository assume a unix environment (bash, coreutils, etc.),
 Some part of the artifact additionally require:
 - [AGEMA](https://github.com/Chair-for-Security-Engineering/AGEMA) (commit `4e43d9d61` tested)
 - [fullverif](https://github.com/cassiersg/fullverif) (commit `227f31215` tested)
-- [SILVER](https://github.com/Chair-for-Security-Engineering/SILVER) (commit `57fd89b71` tested)
+- [SILVER](https://github.com/Chair-for-Security-Engineering/SILVER) (commit `57fd89b71` tested, some more recent versions do not work)
 - [GHDL](https://github.com/ghdl/ghdl) (version 4.1.0 tested)
 
 ## Contents
@@ -123,8 +123,11 @@ The security of these gadgets can be automatically verified using
 make silver
 ```
 
-(The first-order verification takes a few minutes, the second-order
-verification of the larger gadgets ca take multiple hours.)
+The first-order verification takes a few minutes, the second-order
+verification of the larger gadgets ca take multiple hours.
+
+If the first-order verification stalls, check that you are using the supported
+SILVER version (see above).
 
 ### AES
 
