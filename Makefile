@@ -106,12 +106,12 @@ adders_agema: adder_circuits
 	)
 
 ### Gadget verfication with silver ###
-silver:
+silver: 
 	mkdir -p work/silver_d2 work/silver_d3
 	@echo "#### First-order verification ####"
-	-cd gadget_verif && python silver_fv_gadget.py --circuits $$(find ../compress/gadget_library/MSK/ -iname '*.v') --work ../work/silver_d2 --silver-root $(SILVER_ROOT) --nshares 2
+	${PYTHON_VE}; cd gadget_verif && python silver_fv_gadget.py --circuits $$(find ../compress/gadget_library/MSK/ -iname '*.v') --work ../work/silver_d2 --silver-root $(SILVER_ROOT) --nshares 2
 	@echo "#### Second-order verification ####"
-	-cd gadget_verif && python silver_fv_gadget.py --circuits $$(find ../compress/gadget_library/MSK/ -iname '*.v' | grep -v ghpc) --work ../work/silver_d3 --silver-root $(SILVER_ROOT) --nshares 3
+	${PYTHON_VE}; cd gadget_verif && python silver_fv_gadget.py --circuits $$(find ../compress/gadget_library/MSK/ -iname '*.v' | grep -v ghpc) --work ../work/silver_d3 --silver-root $(SILVER_ROOT) --nshares 3
 
 
 ### Full AES instances ###
@@ -122,7 +122,7 @@ aes32beh: aes_sbox_opt canright_aes_sbox_opt
 	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/beh_simu WORK=$(abspath ./work/aes32canrightbeh_d$D) NUM_SHARES=$D CANRIGHT=1 simu; )
 
 aes32synth: aes_sbox_opt canright_aes_sbox_opt
-	make -C full_aes/32-bit/synth WORK=$(abspath ./work/aes32synth) report
+	${PYTHON_VE}; make -C full_aes/32-bit/synth WORK=$(abspath ./work/aes32synth) report
 
 aes32postsynth:
 	set -e; $(foreach D,$(DS), make -C full_aes/32-bit/post_synth_simu SYNTH_WORK=$(abspath ./work/aes32synth) NUM_SHARES=$D WORK=$(abspath ./work/aes32postsynth_d$D) simu; )
@@ -137,7 +137,7 @@ aes128beh: aes_sbox_opt canright_aes_sbox_opt
 	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/beh_simu WORK=$(abspath ./work/aes128canrightbeh_d$D) NUM_SHARES=$D CANRIGHT=1 simu; )
 
 aes128synth: aes_sbox_opt canright_aes_sbox_opt
-	make -C full_aes/128-bit/synth WORK=$(abspath ./work/aes128synth) report
+	${PYTHON_VE}; make -C full_aes/128-bit/synth WORK=$(abspath ./work/aes128synth) report
 
 aes128postsynth:
 	set -e; $(foreach D,$(DS), make -C full_aes/128-bit/post_synth_simu SYNTH_WORK=$(abspath ./work/aes128synth) NUM_SHARES=$D WORK=$(abspath ./work/aes128postsynth_d$D) simu; )
