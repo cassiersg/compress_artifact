@@ -23,6 +23,7 @@ $(VE)/pyvenv.cfg:
 
 $(VE_INSTALLED): $(VE)/pyvenv.cfg
 	${PYTHON_VE}; python -m pip install -r compress/requirements.txt
+	${PYTHON_VE}; python -m pip install tqdm=4.66.4
 	touch $(VE_INSTALLED)
 
 ### Sboxes ###

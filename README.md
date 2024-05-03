@@ -123,6 +123,9 @@ The security of these gadgets can be automatically verified using
 make silver
 ```
 
+(The first-order verification takes a few minutes, the second-order
+verification of the larger gadgets ca take multiple hours.)
+
 ### AES
 
 For the 32-bit AES:
