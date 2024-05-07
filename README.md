@@ -153,8 +153,14 @@ For the 128-bit AES:
 The synthesis results summary is then located in `work/aes128synth/areas.csv`. The file contains entries for the following designs:
 
 - aeshpc: AES with 6-cycles Sbox from [MCS22] 
+- new\_1round: Round based AES with 4-cycles COMPRESS Sbox (Boyard Peralta repr.).
 - new: AES with 4-cycles COMPRESS Sbox (Boyard Peralta repr.)
 - newcanright: AES with 4-cycles COMPRESS Sbox (Canright repr.)
 
 For the (128-bit) AES of AGEMA:
 - `make aes128agema`
+
+For an round based implementation (fully) generated with compress (Boyard Peralta repr.):
+-  make aes\_round\_compress 
+
+The synthesis results summary is located in `work/aes_round_compress/aes_round_compress_area.csv`. In the paper, these results are compared with the "handmade" implementation of the round based implementation.  
