@@ -132,12 +132,12 @@ SILVER version (see above).
 ### AES
 
 For the 32-bit AES:
-```
-make aes32beh # performs a behavioral simulation
-make aes32synth # runs a synthesis (yosys+NanGate45), and compares with [SMAesH](https://github.com/SIMPLE-Crypto/SMAesH).
-make aes32postsynth # verifies the synthesized circuit with a simulation
-make aes32fullverif # runs [fullverif](https://github.com/cassiersg/fullverif) to verify the security of the implementation
-```
+
+- `make aes32beh` performs a behavioral simulation
+- `make aes32synth` runs a synthesis (yosys+NanGate45), and compares with [SMAesH](https://github.com/SIMPLE-Crypto/SMAesH).
+- `make aes32postsynth` verifies the synthesized circuit with a simulation
+- `make aes32fullverif` runs [fullverif](https://github.com/cassiersg/fullverif) to verify the security of the implementation
+
 The synthesis results summary is then located in `work/aes32synth/areas.csv`. The file contains entries for the following designs:
 
 - new: AES (SMAesH based) with 4-cycles COMPRESS Sbox (Boyard Peralta repr.) 
@@ -145,12 +145,10 @@ The synthesis results summary is then located in `work/aes32synth/areas.csv`. Th
 - smaesh: SMAesH design using Sbox from [MCS22]. 
 
 For the 128-bit AES:
-```
-make aes128beh performs a behavioral simulation
-make aes128synth runs a synthesis (yosys+NanGate45), and compares with the [related work](https://eprint.iacr.org/2022/252).
-make aes128postsynth verifies the synthesized circuit with a simulation
-make aes128fullverif runs [fullverif](https://github.com/cassiersg/fullverif) to verify the security of the implementation
-```
+- `make aes128beh` performs a behavioral simulation
+- `make aes128synth` runs a synthesis (yosys+NanGate45), and compares with the [related work](https://eprint.iacr.org/2022/252).
+- `make aes128postsynth` verifies the synthesized circuit with a simulation
+- `make aes128fullverif` runs [fullverif](https://github.com/cassiersg/fullverif) to verify the security of the implementation
 
 The synthesis results summary is then located in `work/aes128synth/areas.csv`. The file contains entries for the following designs:
 
