@@ -45,6 +45,20 @@ sbox_agema:
 skinny_sbox_serialized:
 	make -C skinny_serialized_sbox WORK=$(abspath work/skinny_serialized) DS="2 3 4 5"
 
+### Masked AES Sbox with TI
+lr_2OM_aes_sbox:
+	make -C low_random_second_order_aes WORK=$(abspath work/low_random_second_order_aes) area 
+
+### DOM AES Sbox
+dom_aes_sbox:
+	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=2 make -C dom-sbox area 
+	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=3 make -C dom-sbox area 
+	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=4 make -C dom-sbox area 
+	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=5 make -C dom-sbox area 
+
+skinny_ti:
+	make -C skinny_ti WORK=$(abspath work/skinny_ti)
+
 # canright compress
 canright_aes_sbox_opt: $(VE_INSTALLED)
 	# Generate AES S-box designs reported in the paper.
@@ -128,18 +142,9 @@ aes128fullverif: aes_sbox_opt
 aes128agema:
 	make -C agema_direct WORK=$(abspath work/aes128agema) MODULE_NAME=AES SRC_VERILOG=$(AGEMA_ROOT)/../CaseStudies/08_AES128_round_based_encryption/netlists/AES.v
 
-
-### Masked AES Sbox with TI
-lr_2OM_aes_sbox:
-	make -C low_random_second_order_aes WORK=$(abspath work/low_random_second_order_aes) area 
-
-### DOM AES Sbox
-dom_aes_sbox:
-	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=2 make -C dom-sbox area 
-	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=3 make -C dom-sbox area 
-	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=4 make -C dom-sbox area 
-	set -e; WORK=$(abspath work/DOM_aes_sbox) NSHARES=5 make -C dom-sbox area 
 	
 
 help:
-	@echo "See REDAME.md."
+	@echo "See README.md."
+
+.PHONY: skinny_ti

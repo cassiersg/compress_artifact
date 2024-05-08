@@ -1,8 +1,11 @@
 # COMPRESS artifact
 
-This repository contains the artifact for the paper
-[**Compress: Reducing Area and Latency of Masked Pipelined Circuits**](https://eprint.iacr.org/2023/1600).
-The artifact contains all the code on which the results presented in the paper are based, except for COMPRESS itself, which is in a [separate repository](https://github.com/cassiersg/compress) (and is included as a submodule of this repository).
+This repository contains the artifact for the paper [**Compress: Reducing Area
+and Latency of Masked Pipelined Circuits**](https://eprint.iacr.org/2023/1600).
+The artifact contains all the code on which the results presented in the paper
+are based, except for COMPRESS itself, which is in a [separate
+repository](https://github.com/cassiersg/compress) (and is included as a
+submodule of this repository).
 
 ## Getting started
 
@@ -21,6 +24,7 @@ Some part of the artifact additionally require:
 - [AGEMA](https://github.com/Chair-for-Security-Engineering/AGEMA) (commit `4e43d9d61` tested)
 - [fullverif](https://github.com/cassiersg/fullverif) (commit `227f31215` tested)
 - [SILVER](https://github.com/Chair-for-Security-Engineering/SILVER) (commit `57fd89b71` tested)
+- [GHDL](https://github.com/ghdl/ghdl) (version 4.1.0 tested)
 
 ## Contents
 
@@ -30,13 +34,16 @@ Some part of the artifact additionally require:
 ├── agema_direct # Masked circuit generation and synthesis of AGEMA example circuits.
 ├── canright # Masking of Canright AES Sbox with COMPRESS.
 ├── compress # Submodule containing COMPRESS and misc. gadgets.
+├── dom-sbox # Masking of Canright AES Sbox with DOM [GMK16]. 
 ├── full_aes
 │   ├── 128-bit # round-based AES
 │   └── 32-bit # AES with 32-bit serial architecture
 ├── gadget_verif # Verification of COMPRESS gadgets with SILVER.
+├── low_random_second_order_aes # AES Sbox of [DSM22]
 ├── Makefile # Top-level makefile for running all flows of this repository.
 ├── skinny_serialized_sbox # Skinny Sbox of [VCS22].
-└── work # Where all temporary and result files go.
+├── skinny_ti # Skinny Sbox of [CCGB21].
+└── work # Where all temporary and result files are generated.
 ```
 
 ## Usage
@@ -64,18 +71,36 @@ make aes_sbox_compress
 make canright_aes_sbox_opt
 make skinny_sbox_compress
 make sbox_handcrafting
-make sbox_agema
+make sbox_agema # Requires $AGEMA_ROOT to be set
 ```
 The reports for area usage and design generation execution time are in 
 `work/{aes,skinny}_{opt,sep,base}/{aes_bp,skinny8}_area.csv` for COMPRESS,
 `work/handcrafting/{aes_bp,skinny8}_area.csv` for handcrafting, and
 `work/agema_{skinny,aes}/{aes_bp,skinny8}_areas.csv` for AGEMA.
 
-Finally, we synthesize the serialized Skinny8 S-box of [VCS22] with
+Besides, we synthesize the serialized Skinny8 S-box of [VCS22] with
 ```
 make skinny_sbox_serialized
 ```
 Area report is generated in `work/skinny_serialized/areas.csv`.
+
+Additionally, the synthesis results for the AES Sbox with DOM are obtained with
+```
+make dom_aes_sbox
+```
+and the Yosys area report is generated in `work/DOM_aes_sbox/d{2,3,4,5}/area/area.json`.
+
+For the AES Sbox from [DSM22], the area synthesis results are obtained with 
+```
+make lr_2OM_aes_sbox
+```
+and the Yosys area report is generated in `work/low_random_second_order_aes/area/area.json`.
+
+Finally, the Skinny Sbox synthesis results from [CCGB21] are obtained via
+```
+make skinny_ti
+```
+and the Yosys area report is generated in `work/skinny_ti/skinny-hdl-thresh-{222,2222,232,33}/area.json`.
 
 ### Adders
 
@@ -86,8 +111,8 @@ make adders_compress
 make adders_handcrafting
 make adders_agema
 ```
-Area reports are generated respectively in work/adders/*.csv`,
-work/adders_handcrafting/*.csv` and work/adders_agema/*.csv`.
+Area reports are generated respectively in `work/adders/*.csv`,
+`work/adders_handcrafting/*.csv` and `work/adders_agema/*.csv`.
 
 ### COMPRESS gadget verification
 
