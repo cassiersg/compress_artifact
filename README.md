@@ -63,6 +63,20 @@ All components of the artifact can be run through the top-level `Makefile`.
 - For AES design verification: `FULLVERIF` must point to the `fullverif` binary (typically ending in `fullverif-check/target/release/fullverif`), or `fullverif` must be in `PATH`.
 - For gadget verification with SILVER: `SILVER_ROOT` must point to the root SILVER directory (the one that contains `bin/` and `cell/`).
 
+### Optionnal environment variables
+
+Some of the `Makefile` targets developped after may take a significant time to complete. Typically, the time required to simulate the execution of a circuit can be of the order of an hour for behavioural simulation, or several hours for structural simulations. Besides, the execution time of COMPRESS is rather fast for small circuit, but increase with the size of the circuit due to the usage of a SAT solver. Based on that, the following environment variables enable some level of control on the flow by skipping the most time consuming steps:
+
+- `SKIP_BEH_SIMU` (default: 0): set to 1 in order to skip behavioral simulations.
+- `SKIP_STRUCT_SIMU` (default: 1): set to 1 in order to skip structural simulations.
+- `TIMEOUT_COMPRESS` (default: 3600): timeout (in seconds) for the COMPRESS' SAT solver execution time. CAUTION: reducing the timeout value may affect the performances of the generated circuits (e.g., some adders circuits reached the 1h timeout, as mentioned in Table 7 of the paper). 
+
+You can set these variables by editing the Makefile, or directly in the make command as follows:
+
+```
+SKIP_STRUCT_SIMU=1 make $TARGET
+```
+
 ### S-boxes 
 
 The following `make` targets generate masked AES and 8-bit Skinny S-box designs
@@ -131,9 +145,7 @@ Generation of masked adder circuits and their synthesis is very similar to the
 S-boxes, with the following commands:
 
 ```
-make adders_compress
-make adders_handcrafting
-make adders_agema
+make adders_compress adders_handcrafting adders_agema
 ```
 
 Area reports are generated respectively in `work/adders/*.csv`,
@@ -155,7 +167,7 @@ verification of the larger gadgets ca take multiple hours.
 If the first-order verification stalls, check that you are using the supported
 SILVER version (see above).
 
-### Full AES-128 designs
+### Full AES designs
 
 For the 32-bit datapath:
 
