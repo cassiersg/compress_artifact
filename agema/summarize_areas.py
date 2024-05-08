@@ -1,10 +1,15 @@
+"""
+Parse .json area reports from Yosys and summarize them in a CSV, estimating the
+area used by a Trivium PRNG to generate the required randomness.
+"""
 import argparse
 import csv
 import re
 import json
 from pathlib import Path
 
-GE = 0.798  # Nangate45
+GE = 0.798  # um^2, for Nangate45
+# From syntheses of Trivium (work/aes_opt/rng_area/area_ge.txt).
 AREA_RND_GE = 39.3606770833333
 
 
@@ -27,7 +32,7 @@ def parse_reports(reports, module):
             AREA_RND_GE * rnd_bits
         )  # RNG bit-area copied from synthesis results
         yield {
-            "design": f'{module}_{hpc}',
+            "design": f"{module}_{hpc}",
             "nshares": order + 1,
             "latency": latency,
             "area_ge": area_ge,

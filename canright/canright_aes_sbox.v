@@ -1,4 +1,4 @@
-// Straight translation of Canright's S-box in verilog.
+// Straight translation of Canright's S-box in verilog (no inverse).
 
 // multiplication in GF(2^2) using normal basis (Omega^2, Omega)
 module G4_mul(input wire [1:0] x, input wire [1:0] y, output wire [1:0] z);

@@ -1,5 +1,7 @@
 # `aes_enc128_32bits_hpc2` HDL tree
 
+Canonical location: <https://github.com/simple-crypto/smaesh>.
+
 This is is a masked implementation of AES-128 encryption using the HPC2 masking
 scheme and a 32-bit architecture based on <https://eprint.iacr.org/2022/252>.
 

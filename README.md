@@ -9,18 +9,20 @@ submodule of this repository).
 
 ## Getting started
 
-Clone the repository with the [submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules):
+When getting this artifact from github, clone the repository with the
+[submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules):
 ```
 git clone --recursive https://github.com/cassiersg/compress_artifact
 ```
 
-The scripts in the repository assume a unix environment (bash, coreutils, etc.), as well as the following dependencies:
+The scripts in the repository assume a unix environment (bash, GNU make, coreutils, etc.), as well as the following dependencies:
 
-- python3 with venv (`python3-venv` on Ubuntu)
+- python3 (python3.10 tested) with venv (`python3-venv` on Ubuntu)
 - yosys (version 0.33 tested)
 - iverilog (version 11.0 tested)
 
 Some part of the artifact additionally require:
+
 - [AGEMA](https://github.com/Chair-for-Security-Engineering/AGEMA) (commit `4e43d9d61` tested)
 - [fullverif](https://github.com/cassiersg/fullverif) (commit `227f31215` tested)
 - [SILVER](https://github.com/Chair-for-Security-Engineering/SILVER) (commit `57fd89b71` tested, some more recent versions do not work)
@@ -33,92 +35,116 @@ Some part of the artifact additionally require:
 ├── agema # Automated masking of COMPRESS .txt files with AGEMA.
 ├── agema_direct # Masked circuit generation and synthesis of AGEMA example circuits.
 ├── canright # Masking of Canright AES Sbox with COMPRESS.
-├── compress # Submodule containing COMPRESS and misc. gadgets.
+├── compress # Submodule containing COMPRESS, masked gadgets and simulation/synthesis scripts.
 ├── dom-sbox # Masking of Canright AES Sbox with DOM [GMK16]. 
 ├── full_aes
 │   ├── 128-bit # round-based AES
 │   └── 32-bit # AES with 32-bit serial architecture
 ├── gadget_verif # Verification of COMPRESS gadgets with SILVER.
-├── low_random_second_order_aes # AES Sbox of [DSM22]
+├── low_random_second_order_aes # Masked TI AES Sbox of [DSM22]
 ├── Makefile # Top-level makefile for running all flows of this repository.
-├── skinny_serialized_sbox # Skinny Sbox of [VCS22].
-├── skinny_ti # Skinny Sbox of [CCGB21].
+├── skinny_serialized_sbox # Masked serialized 8-bit Skinny Sbox of [VCS22].
+├── skinny_ti # Masked TI 8-bit Skinny Sbox of [CCGB21].
 └── work # Where all temporary and result files are generated.
 ```
 
-## Usage
+## Using COMPRESS directly
+
+See `compress/README.md` or <https://github.com/cassiersg/compress>.
+
+## Reproducing results of the paper
 
 All components of the artifact can be run through the top-level `Makefile`.
 
 ### Required environment variables
 
 - `yosys` and `iverilog` must be in `PATH`.
-- `AGEMA_ROOT` must point to the root AGEMA directory (the one that contains `bin/` and `cell/`).
-- `FULLVERIF` must point to the `fullverif` binary (typically ending in `fullverif-check/target/release/fullverif`), or `fullverif` must be in `PATH`.
-- `SILVER_ROOT` must point to the root SILVER directory (the one that contains `bin/` and `cell/`).
+- For AGEMA targets: `AGEMA_ROOT` must point to the root AGEMA directory (the one that contains `bin/` and `cell/`).
+- For AES design verification: `FULLVERIF` must point to the `fullverif` binary (typically ending in `fullverif-check/target/release/fullverif`), or `fullverif` must be in `PATH`.
+- For gadget verification with SILVER: `SILVER_ROOT` must point to the root SILVER directory (the one that contains `bin/` and `cell/`).
 
-### S-boxes
+### S-boxes 
 
-Design of S-box (AES and Skinny 8-bit) implementation using the new COMPRESS
-tool, optimized HPC2 implementations with the tool of the
-[''handcrafting''](https://eprint.iacr.org/2022/252) paper, or pipeline HPC3
-implementation using
-[AGEMA](https://github.com/Chair-for-Security-Engineering/AGEMA).
+The following `make` targets generate masked AES and 8-bit Skinny S-box designs
+using various automated tools.
 These also synthesize the designs and report area, using yosys and
 the NanGate45 library.
-```
-make aes_sbox_compress
-make canright_aes_sbox_opt
-make skinny_sbox_compress
-make sbox_handcrafting
-make sbox_agema # Requires $AGEMA_ROOT to be set
-```
+
+- COMPRESS (new):
+
+    ```
+    make aes_sbox_compress # Boyar-Peralta AES S-box
+    make canright_aes_sbox_opt # Canright AES S-box
+    make skinny_sbox_compress
+    ```
+
+- Optimized HPC2 implementations with the tool of the
+[''handcrafting''](https://eprint.iacr.org/2022/252) paper:
+
+    ```
+    make sbox_handcrafting
+    ```
+
+- Pipeline HPC3 implementation using
+[AGEMA](https://github.com/Chair-for-Security-Engineering/AGEMA).
+
+    ```
+    make sbox_agema # Requires $AGEMA_ROOT to be set
+    ```
+
 The reports for area usage and design generation execution time are in 
 `work/{aes,skinny}_{opt,sep,base}/{aes_bp,skinny8}_area.csv` for COMPRESS,
 `work/handcrafting/{aes_bp,skinny8}_area.csv` for handcrafting, and
 `work/agema_{skinny,aes}/{aes_bp,skinny8}_areas.csv` for AGEMA.
 
-Besides, we synthesize the serialized Skinny8 S-box of [VCS22] with
-```
-make skinny_sbox_serialized
-```
-Area report is generated in `work/skinny_serialized/areas.csv`.
 
-Additionally, the synthesis results for the AES Sbox with DOM are obtained with
-```
-make dom_aes_sbox
-```
-and the (Yosys) area report is generated in `work/DOM_aes_sbox/d{2,3,4,5}/area/area.json`.
+We also synthesize existing masked S-box designs with yosys and Nangate45:
 
-For the AES Sbox from [DSM22], the area synthesis results are obtained with 
-```
-make lr_2OM_aes_sbox
-```
-and the (Yosys) area report is generated in `work/low_random_second_order_aes/area/area.json`.
 
-Finally, the Skinny Sbox synthesis results from [CCGB21] are obtained via
-```
-make skinny_ti
-```
-and the (Yosys) area report is generated in `work/skinny_ti/skinny-hdl-thresh-{222,2222,232,33}/area.json`.
+- Serialized Skinny8 S-box of [VCS22] (area report: `work/skinny_serialized/areas.csv`):
+
+    ```
+    make skinny_sbox_serialized
+    ```
+
+- DOM-indep AES S-box [GMK16] (area report: `work/DOM_aes_sbox/d{2,3,4,5}/area/area.json`):
+
+    ```
+    make dom_aes_sbox
+    ```
+
+- AES Sbox from [DSM22] (area report: `work/low_random_second_order_aes/area/area.json`):
+
+    ```
+    make lr_2OM_aes_sbox
+    ```
+
+- Skinny Sbox from [CCGB21] (area report: `work/skinny_ti/skinny-hdl-thresh-{222,2222,232,33}/area.json`):
+
+    ```
+    make skinny_ti
+    ```
 
 ### Adders
 
 Generation of masked adder circuits and their synthesis is very similar to the
-S-boxes, with the following commands.
+S-boxes, with the following commands:
+
 ```
 make adders_compress
 make adders_handcrafting
 make adders_agema
 ```
+
 Area reports are generated respectively in `work/adders/*.csv`,
 `work/adders_handcrafting/*.csv` and `work/adders_agema/*.csv`.
 
 ### COMPRESS gadget verification
 
-COMPRESS comes with a few variants of HPC2 and HPC3.
-The security of these gadgets can be automatically verified using
-[SILVER](https://github.com/chair-for-Security-Engineering/silver).
+COMPRESS comes with some new gadgets. In addition to the security proofs in the
+paper, these gadgets can be verified at the first- and second-order using
+[SILVER](https://github.com/chair-for-Security-Engineering/silver):
+
 ```
 make silver
 ```
@@ -129,9 +155,9 @@ verification of the larger gadgets ca take multiple hours.
 If the first-order verification stalls, check that you are using the supported
 SILVER version (see above).
 
-### AES
+### Full AES-128 designs
 
-For the 32-bit AES:
+For the 32-bit datapath:
 
 - `make aes32beh` performs a behavioral simulation
 - `make aes32synth` runs a synthesis (yosys+NanGate45), and compares with [SMAesH](https://github.com/SIMPLE-Crypto/SMAesH).
@@ -140,11 +166,12 @@ For the 32-bit AES:
 
 The synthesis results summary is then located in `work/aes32synth/areas.csv`. The file contains entries for the following designs:
 
-- new: AES (SMAesH based) with 4-cycles COMPRESS Sbox (Boyard Peralta repr.) 
-- newcanright: AES (SMAesH based) with 4-cycles COMPRESS Sbox (Canright repr.)
-- smaesh: SMAesH design using Sbox from [MCS22]. 
+- `new`: AES (SMAesH based) with 4-cycles COMPRESS Sbox (Boyard Peralta repr.) 
+- `newcanright`: AES (SMAesH based) with 4-cycles COMPRESS Sbox (Canright repr.)
+- `smaesh`: SMAesH design using Sbox from [MCS22]. 
 
-For the 128-bit AES:
+For the 128-bit datapath (round-based):
+
 - `make aes128beh` performs a behavioral simulation
 - `make aes128synth` runs a synthesis (yosys+NanGate45), and compares with the [related work](https://eprint.iacr.org/2022/252).
 - `make aes128postsynth` verifies the synthesized circuit with a simulation
@@ -152,15 +179,21 @@ For the 128-bit AES:
 
 The synthesis results summary is then located in `work/aes128synth/areas.csv`. The file contains entries for the following designs:
 
-- aeshpc: AES with 6-cycles Sbox from [MCS22] 
-- new\_1round: Round based AES with 4-cycles COMPRESS Sbox (Boyard Peralta repr.).
-- new: AES with 4-cycles COMPRESS Sbox (Boyard Peralta repr.)
-- newcanright: AES with 4-cycles COMPRESS Sbox (Canright repr.)
+- `aeshpc`: AES with 6-cycles Sbox from [MCS22] 
+- `new`: AES with 4-cycles COMPRESS Sbox (Boyard Peralta repr.)
+- `newcanright`: AES with 4-cycles COMPRESS Sbox (Canright repr.)
+- `new_1round`: 1 round AES pipeline (Boyard Peralta repr., does not include PRNG and state register/control MUXES).
 
-For the (128-bit) AES of AGEMA:
-- `make aes128agema`
+For the (128-bit datapath) AES of AGEMA:
 
-For an round based implementation (fully) generated with compress (Boyard Peralta repr.):
--  `make aes_round_compress`
+```
+make aes128agema
+```
 
-The synthesis results summary is located in `work/aes_round_compress/aes_round_compress_area.csv`. In the paper, these results are compared with the "handmade" implementation of the round based implementation (i.e., the results reported for `new\_1round` above).  
+For a round-based implementation (fully) generated with compress (Boyard Peralta repr.):
+
+```
+make aes_round_compress
+```
+
+The synthesis results summary is located in `work/aes_round_compress/aes_round_compress_area.csv`. In the paper, these results are compared with the "handmade" implementation of the round based implementation (i.e., the results reported for `new_1round` above).

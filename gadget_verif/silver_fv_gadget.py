@@ -1,3 +1,7 @@
+"""
+Verification of gadgets with SILVER. Uses fullverif annotations on the gadget
+and generates the SILVER annotations (parsing of verilog done with Yosys).
+"""
 import argparse
 from dataclasses import dataclass
 import json
