@@ -63,15 +63,24 @@ All components of the artifact can be run through the top-level `Makefile`.
 - For AES design verification: `FULLVERIF` must point to the `fullverif` binary (typically ending in `fullverif-check/target/release/fullverif`), or `fullverif` must be in `PATH`.
 - For gadget verification with SILVER: `SILVER_ROOT` must point to the root SILVER directory (the one that contains `bin/` and `cell/`).
 
-### Optionnal environment variables
+### Optional environment variables
 
-Some of the Makefile targets detailed after may take a significant time to complete. Typically, the time required to simulate the execution of a circuit can be of the order of an hour for behavioral simulations, or several hours for structural simulations. Besides, the execution time of COMPRESS is rather fast for small circuit, but increase with the circuit size due to the usage of a SAT solver. Based on that, the following environment variables enable some control level on the flow by configuring the most time consuming steps:
+Some of the Makefile targets detailed after may take a significant time to
+complete. The time required to simulate the largest circuits can be of the
+order of an hour for behavioral simulations, or several hours for structural
+simulations. Besides, the execution time of COMPRESS is rather fast (seconds to
+minutes) for small circuit, but increase with the circuit size due to the usage
+of a CP solver (in the artifact, only some adder circuits take a long time).
 
-- `SKIP_BEH_SIMU` (default: 0): set to 1 in order to skip behavioral simulations.
-- `SKIP_STRUCT_SIMU` (default: 1): set to 1 in order to skip structural simulations.
-- `TIMEOUT_COMPRESS` (default: 3600): timeout (in seconds) for the COMPRESS' SAT solver execution time. CAUTION: reducing the timeout value may affect the performances of the generated circuits (e.g., some adders circuits reached the 1h timeout, as mentioned in Table 7 of the paper). 
+The following environment variables provide configuration for the most time consuming steps:
 
-You can set these variables by editing the Makefile, or directly in the make command as follows:
+- `SKIP_BEH_SIMU` (default: 0): set to 0 (resp. 1) in order to run (resp. skip) behavioral simulations.
+- `SKIP_STRUCT_SIMU` (default: 1): set to 0 (resp. 1) in order to run (resp. skip) structural simulations.
+- `TIMEOUT_COMPRESS` (default: 3600): timeout (in seconds) for the COMPRESS CP
+solver execution time. Reducing the timeout value may affect the performance of
+the generated circuits (e.g., some adders circuits reached the 1h timeout, as
+mentioned in Table 7 of the paper). Running on a small machine may have the
+same effect (we used a 64-core machine).
 
 ```
 SKIP_STRUCT_SIMU=1 make $TARGET
