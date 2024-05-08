@@ -65,7 +65,7 @@ All components of the artifact can be run through the top-level `Makefile`.
 
 ### Optionnal environment variables
 
-Some of the `Makefile` targets developped after may take a significant time to complete. Typically, the time required to simulate the execution of a circuit can be of the order of an hour for behavioural simulation, or several hours for structural simulations. Besides, the execution time of COMPRESS is rather fast for small circuit, but increase with the size of the circuit due to the usage of a SAT solver. Based on that, the following environment variables enable some level of control on the flow by skipping the most time consuming steps:
+Some of the Makefile targets detailed after may take a significant time to complete. Typically, the time required to simulate the execution of a circuit can be of the order of an hour for behavioral simulations, or several hours for structural simulations. Besides, the execution time of COMPRESS is rather fast for small circuit, but increase with the circuit size due to the usage of a SAT solver. Based on that, the following environment variables enable some control level on the flow by configuring the most time consuming steps:
 
 - `SKIP_BEH_SIMU` (default: 0): set to 1 in order to skip behavioral simulations.
 - `SKIP_STRUCT_SIMU` (default: 1): set to 1 in order to skip structural simulations.
