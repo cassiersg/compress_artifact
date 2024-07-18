@@ -28,6 +28,8 @@ Some part of the artifact additionally require:
 - [SILVER](https://github.com/Chair-for-Security-Engineering/SILVER) (commit `57fd89b71` tested, some more recent versions do not work)
 - [GHDL](https://github.com/ghdl/ghdl) (version 4.1.0 tested)
 
+(See [below](#Installing-Dependencies) for detailed dependencies installation instructions.)
+
 ## Contents
 
 ```
@@ -218,3 +220,87 @@ make aes_round_compress
 ```
 
 The synthesis results summary is located in `work/aes_round_compress/aes_round_compress_area.csv`. In the paper, these results are compared with the "handmade" implementation of the round based implementation (i.e., the results reported for `new_1round` above).
+
+## Installing Dependencies
+
+In this section, we provide instructions for installing the dependencies on a
+fresh Debian 12 install (bash shell).
+These should be mostly portable to other linux distributions, we refer to the
+individual tool's documentations for details.
+
+- System packages (includes `iverilog`, `python3` and dependencies of the tools
+    installed next).
+
+    ```
+    apt install python3-venv python3-pip git iverilog build-essential clang bison flex \
+        libreadline-dev gawk tcl-dev libffi-dev git \
+        graphviz xdot pkg-config python3 libboost-system-dev \
+        libboost-python-dev libboost-filesystem-dev zlib1g-dev \
+        libboost-all-dev gnat cmake libgmp-dev curl
+    ```
+
+- Put `~/.local` in `$PATH`
+
+    ```
+    export PATH=$HOME/.local:$PATH
+    ```
+
+- Yosys
+
+    ```
+    git clone https://github.com/YosysHQ/yosys
+    cd yosys
+    git checkout yosys-v0.33
+    make config-gcc PREFIX=$HOME/.local
+    make PREFIX=$HOME/.local
+    make install PREFIX=$HOME/.local
+    ```
+
+- AGEMA (due to the challenges in building all AGEMA's dependencies, some are
+    bundled in the git repo)
+
+    ```
+    git clone https://github.com/cassiersg/agema
+    cd agema/AGEMA
+    git checkout 9cf3e7bd7138606e5432b3d7a9de789250f4b8c6
+    make clean
+    make release
+    ```
+
+- SILVER (due to the challenges in building all SILVER's dependencies, some are
+    bundled in the git repo)
+
+    ```
+    git clone https://github.com/cassiersg/SILVER
+    cd SILVER
+    git checkout ffa6b89a4a724fdbea74b5f74c815820974135c8
+    make release
+    ```
+
+- GHDL
+
+    ```
+    git clone https://github.com/ghdl/ghdl
+    cd ghdl
+    git checkout v4.1.0
+    ./configure --prefix=$HOME/.local
+    make
+    make install
+    ```
+
+- Rust
+
+    ```
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    ```
+
+- fullverif
+
+    ```
+    git clone https://github.com/cassiersg/fullverif
+    git checkout 227f31215d8269c3b78bb0ebaebf6a1db6bc198e
+    cd fullverif/fullverif-check
+    cargo build --release
+    ```
+
+
